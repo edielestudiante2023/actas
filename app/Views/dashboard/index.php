@@ -31,6 +31,12 @@
             </div>
         <?php endif; ?>
 
+        <?php if ($cliente_activo !== null): ?>
+            <div class="mb-3">
+                <a href="<?= base_url('actas') ?>" class="btn btn-success">Gestionar actas</a>
+            </div>
+        <?php endif; ?>
+
         <div class="card mb-3">
             <div class="card-header fw-semibold">Cliente activo</div>
             <div class="card-body">
@@ -89,7 +95,7 @@
             </ul>
         </div>
 
-        <p class="text-muted mt-4 small">Fase 1 (autenticación) lista. Próximo: CRUD de clientes y usuarios. Ver <code>roadmap.md</code>.</p>
+        <p class="text-muted mt-4 small">Siguiente: completar asistentes, quórum y compromisos del acta. Ver <code>roadmap.md</code>.</p>
     </div>
 </body>
 </html>

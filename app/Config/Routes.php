@@ -32,3 +32,11 @@ $routes->group('usuarios', ['filter' => 'auth'], static function ($routes) {
     $routes->post('(:num)', 'Usuarios::update/$1');
     $routes->post('(:num)/estado', 'Usuarios::status/$1');
 });
+
+$routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($routes) {
+    $routes->get('/', 'Actas::index');
+    $routes->get('nuevo', 'Actas::createForm');
+    $routes->post('/', 'Actas::create');
+    $routes->get('(:num)/editar', 'Actas::edit/$1');
+    $routes->post('(:num)', 'Actas::update/$1');
+});
