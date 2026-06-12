@@ -45,6 +45,9 @@ $RECYCLE.BIN/
 .vagrant
 Vagrantfile
 
+# Archivo de notas local del desarrollador
+texto.txt
+
 #-------------------------
 # Temporary Files
 #-------------------------
