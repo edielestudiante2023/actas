@@ -14,6 +14,43 @@
 
 ---
 
+## Recomendaciones para continuar (Codex)
+
+**Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
+
+**Flujo de despliegue (ya probado):**
+1. Local: programar → `git add -A && git commit && git push origin main`.
+2. Servidor (SSH `root@66.29.154.174`, llave `~/.ssh/id_ed25519`):
+   ```bash
+   cd /www/wwwroot/actas && git pull origin main
+   chown -R www:www app public writable && chmod -R 775 writable
+   # si hubo deps nuevas: COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
+   # si hubo migraciones: php spark migrate    (y db:seed si aplica)
+   ```
+3. El docroot del sitio ya apunta a `/public` (config aaPanel). NO tocar.
+
+**Convenciones del proyecto:**
+- Tablas con prefijo `tbl_`, motor InnoDB, `utf8mb4`. IDs `INT UNSIGNED`. FKs con `forge->addForeignKey`.
+- **Multi-tenant:** toda consulta de datos de un conjunto debe filtrar por `id_conjunto`. El superadmin (rol con `id_conjunto = NULL`) ve todo. Falta crear un guard/scope central — ver Fase 1.
+- Sesión disponible tras login: `isLoggedIn`, `id_usuario`, `nombre`, `email`, `roles` (array de códigos), `roles_full` (con `id_conjunto`), `es_superadmin`.
+- Vistas con Bootstrap 5 por CDN (aún sin layout base; conviene crear `app/Views/layouts/base.php` y migrar login/dashboard a `extend/section`).
+
+**Próximo trabajo sugerido (orden):**
+1. Cerrar Fase 1: filtro RBAC `rol` (alias en `Config/Filters.php`, leer `session('roles')`), selección de conjunto activo (`session('conjunto_activo')`) y recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
+2. Fase 2: `ConjuntoModel`, `RolModel`, `UsuarioRolModel` + CRUDs (conjuntos solo superadmin; usuarios con asignación de rol por conjunto).
+3. Layout base + menú por rol.
+
+**Gotchas conocidos:**
+- DigitalOcean exige SSL: activado por `database.default.ssl=true` en `.env` (ver `app/Config/Database.php`). Local no lo usa.
+- En el server, `.user.ini` es inmutable: `chown -R` falla en ese archivo (ignorar, no es error real).
+- Git en server pidió `safe.directory` (ya configurado para `/www/wwwroot/actas`).
+- URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
+- Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
+
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard}.php`, `app/Filters/AuthFilter.php`, `app/Models/UsuarioModel.php`, `app/Views/{auth/login,dashboard/index}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+
+---
+
 ## Fase 0 — Cimientos (setup)
 - [x] Instalar CodeIgniter 4 (appstarter v4.7.3)
 - [x] Configurar `.env` local + clave de encriptación
