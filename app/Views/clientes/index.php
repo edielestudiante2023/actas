@@ -82,6 +82,7 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-inline-flex gap-2">
+                                        <a href="<?= base_url('clientes/' . $cliente['id_cliente'] . '/consejo') ?>" class="btn btn-sm btn-outline-success">Consejo</a>
                                         <a href="<?= base_url('clientes/' . $cliente['id_cliente'] . '/editar') ?>" class="btn btn-sm btn-outline-primary">Editar</a>
                                         <form action="<?= base_url('clientes/' . $cliente['id_cliente'] . '/estado') ?>" method="post">
                                             <?= csrf_field() ?>

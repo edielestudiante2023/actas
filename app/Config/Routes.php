@@ -15,6 +15,9 @@ $routes->group('clientes', ['filter' => 'auth'], static function ($routes) {
     $routes->get('nuevo', 'Clientes::createForm');
     $routes->post('/', 'Clientes::create');
     $routes->post('activo', 'Clientes::setActive');
+    $routes->get('(:num)/consejo', 'ClienteConsejo::index/$1');
+    $routes->post('(:num)/consejo', 'ClienteConsejo::create/$1');
+    $routes->post('(:num)/consejo/(:num)/estado', 'ClienteConsejo::status/$1/$2');
     $routes->get('(:num)/editar', 'Clientes::edit/$1');
     $routes->post('(:num)', 'Clientes::update/$1');
     $routes->post('(:num)/estado', 'Clientes::deactivate/$1');

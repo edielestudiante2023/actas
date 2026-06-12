@@ -81,4 +81,20 @@ class UsuarioRolModel extends Model
             ]);
         }
     }
+
+    public function usuariosPorRolCliente(int $idCliente, string $codigoRol): array
+    {
+        return $this->db->table('tbl_usuario_rol ur')
+            ->select('u.id_usuario, u.nombre_completo, u.email, u.telefono')
+            ->join('tbl_roles r', 'r.id_rol = ur.id_rol')
+            ->join('tbl_usuarios u', 'u.id_usuario = ur.id_usuario')
+            ->where('ur.id_cliente', $idCliente)
+            ->where('ur.estado', 'activo')
+            ->where('r.codigo', $codigoRol)
+            ->where('r.activo', 1)
+            ->where('u.estado', 'activo')
+            ->orderBy('u.nombre_completo', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
 }

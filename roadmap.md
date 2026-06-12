@@ -40,14 +40,14 @@
 
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Fase 2: gestión de consejo de administración por cliente.
-3. Integrar logo/datos del cliente en el ecosistema post-login.
+2. Integrar logo/datos del cliente en el ecosistema post-login.
+3. Fase 3: migraciones base de actas con `id_cliente` obligatorio.
 4. Recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
 - [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
-- [ ] **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
+- [x] **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
 - [ ] **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
 - [ ] **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF.
 
@@ -58,7 +58,7 @@
 - URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
 - Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
 
-**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
 
 ---
 
@@ -93,7 +93,7 @@
 - [x] CRUD de **clientes** (solo superadmin; incluye logo)
 - [x] Datos del cliente (logo, NIT, dirección, ciudad, teléfono, email)
 - [x] CRUD de **usuarios** + asignación de **roles por cliente**
-- [ ] Gestión de **consejo de administración** por cliente (miembros: presidente, consejeros)
+- [x] Gestión de **consejo de administración** por cliente (miembros: presidente, consejeros)
 - [ ] Integrar logo/datos del cliente en encabezados de actas, PDF y ecosistema post-login
 
 ## Fase 3 — Núcleo de Actas
