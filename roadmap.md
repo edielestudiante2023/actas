@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: asistentes del acta desde consejo del cliente y cálculo de quórum. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: compromisos/tareas del acta con responsable, vencimiento, estado y avance. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -40,7 +40,7 @@
 
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Completar compromisos/tareas del acta.
+2. Completar votaciones/decisiones del acta.
 3. Integrar logo/datos del cliente en encabezados del acta.
 4. Recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
 5. Layout base + menú por rol.
@@ -58,7 +58,7 @@
 - URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
 - Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
 
-**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo,Actas,ActaAsistentes}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel,ActaModel,ActaAsistenteModel,ActaAuditoriaModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*,actas/*}.php`, `app/Database/Migrations/2026-06-12-*` (incluye núcleo de actas), `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo,Actas,ActaAsistentes,ActaCompromisos}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel,ActaModel,ActaAsistenteModel,ActaCompromisoModel,ActaAuditoriaModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*,actas/*}.php`, `app/Database/Migrations/2026-06-12-*` (incluye núcleo de actas), `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
 
 ---
 
@@ -102,7 +102,7 @@
 - [x] Orden del día inicial (plantillas reutilizables pendientes)
 - [x] Registro de asistencia y cálculo de **quórum**
 - [ ] Desarrollo / conclusiones / observaciones
-- [ ] **Compromisos/tareas** (responsable, vencimiento, estado, avance)
+- [x] **Compromisos/tareas** (responsable, vencimiento, estado, avance)
 - [ ] **Votaciones/decisiones** (favor/contra/abstención, resultado)
 - [ ] Anexos (adjuntos)
 - [ ] Estados del acta: `borrador → pendiente_firma → firmada` (+ `en_edicion`, `anulada`)
