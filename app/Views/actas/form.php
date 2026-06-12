@@ -97,6 +97,7 @@
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/asistentes') ?>" class="btn btn-outline-success">Asistentes</a>
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/compromisos') ?>" class="btn btn-outline-warning">Compromisos</a>
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones') ?>" class="btn btn-outline-info">Votaciones</a>
+                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-outline-dark" target="_blank" rel="noopener">PDF</a>
                 <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Guardar borrador</button>
             </div>

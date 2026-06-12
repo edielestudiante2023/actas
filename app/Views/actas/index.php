@@ -75,8 +75,9 @@
                                         <a href="<?= base_url('actas/' . $acta['id_acta'] . '/compromisos') ?>" class="btn btn-sm btn-outline-warning">Compromisos</a>
                                         <a href="<?= base_url('actas/' . $acta['id_acta'] . '/editar') ?>" class="btn btn-sm btn-outline-primary">Editar</a>
                                     <?php else: ?>
-                                        <span class="text-muted small">Solo lectura</span>
+                                        <span class="text-muted small me-2">Solo lectura</span>
                                     <?php endif; ?>
+                                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">PDF</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

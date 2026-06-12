@@ -49,7 +49,7 @@
 - [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
 - [x] **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
 - [x] **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
-- [ ] **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF.
+- [x] **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF (Dompdf v3; respaldo con marca de la app).
 
 **Gotchas conocidos:**
 - DigitalOcean exige SSL: activado por `database.default.ssl=true` en `.env` (ver `app/Config/Database.php`). Local no lo usa.
@@ -94,7 +94,7 @@
 - [x] Datos del cliente (logo, NIT, dirección, ciudad, teléfono, email)
 - [x] CRUD de **usuarios** + asignación de **roles por cliente**
 - [x] Gestión de **consejo de administración** por cliente (miembros: presidente, consejeros)
-- [ ] Integrar logo/datos del cliente en encabezados de actas, PDF y ecosistema post-login
+- [x] Integrar logo/datos del cliente en encabezado del PDF del acta — pendiente: logo en ecosistema post-login (nav)
 
 ## Fase 3 — Núcleo de Actas
 - [x] Migraciones: `tbl_actas`, `tbl_acta_asistentes`, `tbl_acta_compromisos`, `tbl_acta_votaciones`, `tbl_acta_anexos`, `tbl_actas_plantillas_orden`, `tbl_actas_auditoria`
@@ -119,7 +119,7 @@
 - [ ] Solicitud de reapertura y marcar ausente (aprobación por token)
 
 ## Fase 5 — Exportación y notificaciones
-- [ ] Exportar acta a **PDF** (Dompdf)
+- [x] Exportar acta a **PDF** (Dompdf) — incluye logo, datos, asistentes/quórum, votaciones, compromisos
 - [ ] Exportar acta a **Word** (.doc)
 - [ ] Migración `tbl_actas_notificaciones` (cola de emails)
 - [ ] Comando cron `actas:notificaciones` (recordatorios de firma y tareas)
