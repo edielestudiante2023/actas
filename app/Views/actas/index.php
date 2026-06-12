@@ -71,6 +71,7 @@
                                 </td>
                                 <td class="text-end">
                                     <?php if (in_array($acta['estado'], ['borrador', 'en_edicion'], true)): ?>
+                                        <a href="<?= base_url('actas/' . $acta['id_acta'] . '/asistentes') ?>" class="btn btn-sm btn-outline-success">Asistentes</a>
                                         <a href="<?= base_url('actas/' . $acta['id_acta'] . '/editar') ?>" class="btn btn-sm btn-outline-primary">Editar</a>
                                     <?php else: ?>
                                         <span class="text-muted small">Solo lectura</span>

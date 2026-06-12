@@ -93,6 +93,9 @@
             </div>
             <div class="card-footer bg-white d-flex justify-content-end gap-2">
                 <a href="<?= base_url('actas') ?>" class="btn btn-outline-secondary">Cancelar</a>
+                <?php if (! $isNew): ?>
+                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/asistentes') ?>" class="btn btn-outline-success">Asistentes</a>
+                <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Guardar borrador</button>
             </div>
         </form>

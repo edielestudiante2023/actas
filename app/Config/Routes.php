@@ -37,6 +37,9 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->get('/', 'Actas::index');
     $routes->get('nuevo', 'Actas::createForm');
     $routes->post('/', 'Actas::create');
+    $routes->get('(:num)/asistentes', 'ActaAsistentes::index/$1');
+    $routes->post('(:num)/asistentes/importar-consejo', 'ActaAsistentes::importarConsejo/$1');
+    $routes->post('(:num)/asistentes/(:num)', 'ActaAsistentes::update/$1/$2');
     $routes->get('(:num)/editar', 'Actas::edit/$1');
     $routes->post('(:num)', 'Actas::update/$1');
 });
