@@ -25,21 +25,21 @@
 - [x] Seeder de roles (7)
 - [x] Seeder de superadmin (Edison Cuervo)
 - [x] Repo en GitHub + primer push (rama `main`)
-- [ ] Desplegar en servidor de producción (git clone/pull, composer install, `.env` prod, docroot → `/public`)
-- [ ] Migraciones + seeders en producción (DigitalOcean)
-- [ ] Verificar que `https://actas.cycloidtalent.com/` sirve la app (no el index por defecto)
+- [x] Desplegar en servidor de producción (git clone/pull, composer install, `.env` prod, docroot → `/public`)
+- [x] Migraciones + seeders en producción (DigitalOcean)
+- [x] Verificar que `https://actas.cycloidtalent.com/` sirve la app (no el index por defecto)
 
 ## Fase 1 — Autenticación, roles y PWA base
-- [ ] Modelos: `UsuarioModel`, `RolModel`, `ConjuntoModel`, `UsuarioRolModel`
-- [ ] Migración de tabla de sesiones (si se usan sesiones en BD)
-- [ ] Vista + controlador de **login** (email + password, verificación bcrypt)
-- [ ] Filtro `auth` (proteger rutas autenticadas)
+- [x] Modelo `UsuarioModel` (con `findByEmail` y `getRoles`) — faltan `RolModel`, `ConjuntoModel`, `UsuarioRolModel`
+- [x] Sesiones (CI4 file sessions por defecto; no requiere tabla en BD)
+- [x] Vista + controlador de **login** (email + password, verificación bcrypt)
+- [x] Filtro `auth` (proteger rutas autenticadas) — aplicado a `/dashboard`
 - [ ] Filtro `rol` / RBAC (autorización por rol)
 - [ ] Selección de conjunto activo (multi-tenant) y guard de alcance por conjunto
-- [ ] Logout
-- [ ] **PWA instalable desde el login** (`manifest_login.json` + `sw_login.js`, íconos PNG 192/512)
+- [x] Logout
+- [x] **PWA instalable desde el login** (`manifest_login.json` + `sw_login.js`, íconos PNG 192/512)
 - [ ] Recuperación de contraseña por email (cambia la clave temporal `actas123`)
-- [ ] Dashboard inicial por rol
+- [x] Dashboard inicial por rol (básico)
 
 ## Fase 2 — Administración (CRUD maestros)
 - [ ] CRUD de **conjuntos** (solo superadmin)
