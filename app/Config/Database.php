@@ -200,5 +200,18 @@ class Database extends Config
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
         }
+
+        // SSL para conexiones que lo exijan (ej. MySQL gestionado de DigitalOcean,
+        // sslmode=REQUIRED). Se activa SOLO si el .env define database.default.ssl=true,
+        // por lo que el entorno local (XAMPP) no se ve afectado.
+        // El driver MySQLi de CI4 solo habilita SSL si recibe alguna ruta (ssl_ca);
+        // usamos el bundle de CA del sistema y, por defecto, sin verificar el cert del
+        // servidor (suficiente para sslmode=REQUIRED de DigitalOcean).
+        if (filter_var(env('database.default.ssl', false), FILTER_VALIDATE_BOOLEAN)) {
+            $this->default['encrypt'] = [
+                'ssl_ca'     => env('database.default.sslCA', '/etc/ssl/certs/ca-certificates.crt'),
+                'ssl_verify' => filter_var(env('database.default.sslVerify', false), FILTER_VALIDATE_BOOLEAN),
+            ];
+        }
     }
 }
