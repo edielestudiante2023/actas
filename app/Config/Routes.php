@@ -20,3 +20,12 @@ $routes->group('clientes', ['filter' => 'auth'], static function ($routes) {
     $routes->post('(:num)/estado', 'Clientes::deactivate/$1');
     $routes->get('(:num)/logo', 'Clientes::logo/$1');
 });
+
+$routes->group('usuarios', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Usuarios::index');
+    $routes->get('nuevo', 'Usuarios::createForm');
+    $routes->post('/', 'Usuarios::create');
+    $routes->get('(:num)/editar', 'Usuarios::edit/$1');
+    $routes->post('(:num)', 'Usuarios::update/$1');
+    $routes->post('(:num)/estado', 'Usuarios::status/$1');
+});

@@ -25,8 +25,9 @@
         <?php endif; ?>
 
         <?php if (session('es_superadmin')): ?>
-            <div class="mb-3">
+            <div class="mb-3 d-flex flex-wrap gap-2">
                 <a href="<?= base_url('clientes') ?>" class="btn btn-primary">Administrar clientes</a>
+                <a href="<?= base_url('usuarios') ?>" class="btn btn-outline-primary">Administrar usuarios</a>
             </div>
         <?php endif; ?>
 

@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Cambios locales pendientes de commit: renombre a `tbl_clientes`, CRUD de clientes con logo, `ClienteScope`, filtros `rol`/`cliente` y selector de cliente activo. Producción aún no tiene la migración `2026-06-12-000005_RenameConjuntosToClientes`.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: CRUD de usuarios con asignación de roles por cliente. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -40,16 +40,16 @@
 
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Fase 2: `RolModel`, `UsuarioRolModel` + CRUD de usuarios con asignación de rol por cliente.
-3. Gestión de consejo de administración por cliente.
+2. Fase 2: gestión de consejo de administración por cliente.
+3. Integrar logo/datos del cliente en el ecosistema post-login.
 4. Recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
-- **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
-- **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
-- **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
-- **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF.
+- [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
+- [ ] **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
+- [ ] **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
+- [ ] **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF.
 
 **Gotchas conocidos:**
 - DigitalOcean exige SSL: activado por `database.default.ssl=true` en `.env` (ver `app/Config/Database.php`). Local no lo usa.
@@ -58,7 +58,7 @@
 - URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
 - Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
 
-**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
 
 ---
 
@@ -78,7 +78,7 @@
 - [x] Verificar que `https://actas.cycloidtalent.com/` sirve la app (no el index por defecto)
 
 ## Fase 1 — Autenticación, roles y PWA base
-- [x] Modelo `UsuarioModel` (con `findByEmail` y `getRoles`) — faltan `RolModel`, `UsuarioRolModel`
+- [x] Modelos base de usuario/roles (`UsuarioModel`, `RolModel`, `UsuarioRolModel`)
 - [x] Sesiones (CI4 file sessions por defecto; no requiere tabla en BD)
 - [x] Vista + controlador de **login** (email + password, verificación bcrypt)
 - [x] Filtro `auth` (proteger rutas autenticadas) — aplicado a `/dashboard`
@@ -92,7 +92,7 @@
 ## Fase 2 — Administración (CRUD maestros)
 - [x] CRUD de **clientes** (solo superadmin; incluye logo)
 - [x] Datos del cliente (logo, NIT, dirección, ciudad, teléfono, email)
-- [ ] CRUD de **usuarios** + asignación de **roles por cliente**
+- [x] CRUD de **usuarios** + asignación de **roles por cliente**
 - [ ] Gestión de **consejo de administración** por cliente (miembros: presidente, consejeros)
 - [ ] Integrar logo/datos del cliente en encabezados de actas, PDF y ecosistema post-login
 
