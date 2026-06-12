@@ -95,7 +95,7 @@
             </ul>
         </div>
 
-        <p class="text-muted mt-4 small">Siguiente: completar votaciones/decisiones del acta e integrar logo en encabezados. Ver <code>roadmap.md</code>.</p>
+        <p class="text-muted mt-4 small">Siguiente: anexos del acta e integrar logo del cliente en encabezados y export PDF. Ver <code>roadmap.md</code>.</p>
     </div>
 </body>
 </html>

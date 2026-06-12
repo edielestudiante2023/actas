@@ -12,6 +12,7 @@
         <a href="<?= base_url('dashboard') ?>" class="navbar-brand fw-bold text-decoration-none">Actas</a>
         <div class="d-flex gap-2">
             <a href="<?= base_url('actas/' . $acta['id_acta'] . '/asistentes') ?>" class="btn btn-sm btn-outline-light">Asistentes</a>
+            <a href="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones') ?>" class="btn btn-sm btn-outline-light">Votaciones</a>
             <a href="<?= base_url('actas') ?>" class="btn btn-sm btn-outline-light">Actas</a>
             <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
         </div>

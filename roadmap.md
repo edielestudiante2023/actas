@@ -101,9 +101,9 @@
 - [x] Crear acta (borrador): número/consecutivo, fecha, lugar, modalidad
 - [x] Orden del día inicial (plantillas reutilizables pendientes)
 - [x] Registro de asistencia y cálculo de **quórum**
-- [ ] Desarrollo / conclusiones / observaciones
+- [x] Desarrollo / conclusiones / observaciones
 - [x] **Compromisos/tareas** (responsable, vencimiento, estado, avance)
-- [ ] **Votaciones/decisiones** (favor/contra/abstención, resultado)
+- [x] **Votaciones/decisiones** (favor/contra/abstención, resultado por mayoría)
 - [ ] Anexos (adjuntos)
 - [ ] Estados del acta: `borrador → pendiente_firma → firmada` (+ `en_edicion`, `anulada`)
 
