@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: CRUD de usuarios con asignación de roles por cliente. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: migraciones base del núcleo de actas. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -40,15 +40,15 @@
 
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Integrar logo/datos del cliente en el ecosistema post-login.
-3. Fase 3: migraciones base de actas con `id_cliente` obligatorio.
+2. Crear flujo de acta en borrador con `id_cliente` obligatorio y filtro `cliente`.
+3. Integrar logo/datos del cliente en el ecosistema post-login.
 4. Recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
 - [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
 - [x] **Hito B — Consejo por cliente:** definir miembros del consejo usando usuarios existentes y roles `presidente_consejo`/`consejero`.
-- [ ] **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
+- [x] **Hito C — Base de actas:** migraciones de actas usando `id_cliente` obligatorio y `ClienteScope`/filtro `cliente`.
 - [ ] **Hito D — PDF/logo:** integrar `tbl_clientes.logo` en encabezado de actas y exportación PDF.
 
 **Gotchas conocidos:**
@@ -58,7 +58,7 @@
 - URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
 - Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
 
-**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*}.php`, `app/Database/Migrations/2026-06-12-*`, `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*}.php`, `app/Database/Migrations/2026-06-12-*` (incluye núcleo de actas), `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
 
 ---
 
@@ -97,7 +97,7 @@
 - [ ] Integrar logo/datos del cliente en encabezados de actas, PDF y ecosistema post-login
 
 ## Fase 3 — Núcleo de Actas
-- [ ] Migraciones: `tbl_actas`, `tbl_acta_asistentes`, `tbl_acta_compromisos`, `tbl_acta_votaciones`, `tbl_acta_anexos`, `tbl_actas_plantillas_orden`, `tbl_actas_auditoria`
+- [x] Migraciones: `tbl_actas`, `tbl_acta_asistentes`, `tbl_acta_compromisos`, `tbl_acta_votaciones`, `tbl_acta_anexos`, `tbl_actas_plantillas_orden`, `tbl_actas_auditoria`
 - [ ] Crear acta (borrador): número/consecutivo, fecha, lugar, modalidad
 - [ ] Orden del día (con plantillas reutilizables)
 - [ ] Registro de asistencia y cálculo de **quórum**
