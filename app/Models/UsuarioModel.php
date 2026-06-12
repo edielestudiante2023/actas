@@ -21,12 +21,12 @@ class UsuarioModel extends Model
     }
 
     /**
-     * Roles del usuario con su conjunto (id_conjunto NULL = plataforma/superadmin).
+     * Roles del usuario con su cliente (id_cliente NULL = plataforma/superadmin).
      */
     public function getRoles(int $idUsuario): array
     {
         return $this->db->table('tbl_usuario_rol ur')
-            ->select('r.id_rol, r.codigo, r.nombre, r.nivel, ur.id_conjunto')
+            ->select('r.id_rol, r.codigo, r.nombre, r.nivel, ur.id_cliente')
             ->join('tbl_roles r', 'r.id_rol = ur.id_rol')
             ->where('ur.id_usuario', $idUsuario)
             ->where('ur.estado', 'activo')

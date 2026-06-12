@@ -10,7 +10,7 @@ Aplicativo **PWA** para la gestión de **actas de reunión de los consejos de ad
 ## Actores / Roles
 `superadmin`, `administrador`, `presidente_consejo`, `consejero`, `revisor_fiscal`, `contador`, `abogado`.
 
-El aplicativo es **multi-tenant**: una sola instalación atiende varios conjuntos (propiedades horizontales). Un usuario puede tener varios roles, y el rol se asigna **por conjunto**.
+El aplicativo es **multi-tenant**: una sola instalación atiende varios clientes de propiedad horizontal. Un usuario puede tener varios roles, y el rol se asigna **por cliente**.
 
 ## Puesta en marcha (local)
 ```bash

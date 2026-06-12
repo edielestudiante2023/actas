@@ -9,3 +9,14 @@ $routes->post('login', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
 
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
+
+$routes->group('clientes', ['filter' => 'auth'], static function ($routes) {
+    $routes->get('/', 'Clientes::index');
+    $routes->get('nuevo', 'Clientes::createForm');
+    $routes->post('/', 'Clientes::create');
+    $routes->post('activo', 'Clientes::setActive');
+    $routes->get('(:num)/editar', 'Clientes::edit/$1');
+    $routes->post('(:num)', 'Clientes::update/$1');
+    $routes->post('(:num)/estado', 'Clientes::deactivate/$1');
+    $routes->get('(:num)/logo', 'Clientes::logo/$1');
+});

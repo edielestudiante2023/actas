@@ -14,8 +14,65 @@
     </nav>
 
     <div class="container py-4">
-        <h4>Hola, <?= esc(session('nombre')) ?> 👋</h4>
+        <h4>Hola, <?= esc(session('nombre')) ?></h4>
         <p class="text-muted mb-3"><?= esc(session('email')) ?></p>
+
+        <?php if (session('error')): ?>
+            <div class="alert alert-danger py-2"><?= esc(session('error')) ?></div>
+        <?php endif; ?>
+        <?php if (session('success')): ?>
+            <div class="alert alert-success py-2"><?= esc(session('success')) ?></div>
+        <?php endif; ?>
+
+        <?php if (session('es_superadmin')): ?>
+            <div class="mb-3">
+                <a href="<?= base_url('clientes') ?>" class="btn btn-primary">Administrar clientes</a>
+            </div>
+        <?php endif; ?>
+
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Cliente activo</div>
+            <div class="card-body">
+                <?php if ($cliente_activo !== null): ?>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <?php if (! empty($cliente_activo['logo'])): ?>
+                            <img src="<?= base_url('clientes/' . $cliente_activo['id_cliente'] . '/logo') ?>" alt="<?= esc($cliente_activo['nombre']) ?>" style="width:56px;height:56px;object-fit:contain;border:1px solid #dee2e6;border-radius:8px;background:#fff;">
+                        <?php endif; ?>
+                        <div>
+                            <div class="fw-semibold"><?= esc($cliente_activo['nombre']) ?></div>
+                            <div class="text-muted small">ID <?= esc($cliente_activo['id_cliente']) ?></div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <p class="text-muted mb-3">No hay cliente activo seleccionado.</p>
+                <?php endif; ?>
+
+                <?php $clientesDisponibles = $clientes_disponibles ?? []; ?>
+                <?php if ($clientesDisponibles !== []): ?>
+                    <form action="<?= base_url('clientes/activo') ?>" method="post" class="row g-2 align-items-end">
+                        <?= csrf_field() ?>
+                        <div class="col-12 col-md-8">
+                            <label class="form-label">Seleccionar cliente</label>
+                            <select name="id_cliente" class="form-select">
+                                <?php if (session('es_superadmin')): ?>
+                                    <option value="">Sin cliente activo</option>
+                                <?php endif; ?>
+                                <?php foreach ($clientesDisponibles as $cliente): ?>
+                                    <option value="<?= esc($cliente['id_cliente']) ?>" <?= (int) ($cliente_activo['id_cliente'] ?? 0) === (int) $cliente['id_cliente'] ? 'selected' : '' ?>>
+                                        <?= esc($cliente['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button type="submit" class="btn btn-outline-primary w-100">Aplicar</button>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <p class="text-muted mb-0">No tienes clientes activos disponibles.</p>
+                <?php endif; ?>
+            </div>
+        </div>
 
         <div class="card">
             <div class="card-header fw-semibold">Tus roles</div>
@@ -24,14 +81,14 @@
                     <li class="list-group-item d-flex justify-content-between">
                         <span><?= esc($r['nombre']) ?></span>
                         <span class="badge bg-secondary">
-                            <?= $r['id_conjunto'] === null ? 'Plataforma' : 'Conjunto #' . esc($r['id_conjunto']) ?>
+                            <?= $r['id_cliente'] === null ? 'Plataforma' : 'Cliente #' . esc($r['id_cliente']) ?>
                         </span>
                     </li>
                 <?php endforeach; ?>
             </ul>
         </div>
 
-        <p class="text-muted mt-4 small">Fase 1 (autenticación) lista. Próximo: CRUD de conjuntos y usuarios. Ver <code>roadmap.md</code>.</p>
+        <p class="text-muted mt-4 small">Fase 1 (autenticación) lista. Próximo: CRUD de clientes y usuarios. Ver <code>roadmap.md</code>.</p>
     </div>
 </body>
 </html>

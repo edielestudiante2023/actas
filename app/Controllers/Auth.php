@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Libraries\ClienteScope;
 use App\Models\UsuarioModel;
 
 class Auth extends BaseController
@@ -49,6 +50,7 @@ class Auth extends BaseController
         ]);
 
         $model->update($user['id_usuario'], ['ultimo_acceso' => date('Y-m-d H:i:s')]);
+        (new ClienteScope())->syncActiveSession();
 
         return redirect()->to('/dashboard');
     }

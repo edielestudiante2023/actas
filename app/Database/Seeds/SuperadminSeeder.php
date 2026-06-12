@@ -38,7 +38,7 @@ class SuperadminSeeder extends Seeder
             echo "Superadmin ya existe (id={$idUsuario}): {$email}\n";
         }
 
-        // Rol superadmin (id_conjunto = NULL => plataforma global).
+        // Rol superadmin (id_cliente = NULL => plataforma global).
         $rol = $this->db->table('tbl_roles')->where('codigo', 'superadmin')->get()->getRowArray();
         if ($rol === null) {
             echo "ERROR: no existe el rol 'superadmin'. Corre primero RolesSeeder.\n";
@@ -50,14 +50,14 @@ class SuperadminSeeder extends Seeder
         $existeAsignacion = $usuarioRolTable
             ->where('id_usuario', $idUsuario)
             ->where('id_rol', $idRol)
-            ->where('id_conjunto', null)
+            ->where('id_cliente', null)
             ->countAllResults();
 
         if ($existeAsignacion == 0) {
             $usuarioRolTable->insert([
                 'id_usuario'  => $idUsuario,
                 'id_rol'      => $idRol,
-                'id_conjunto' => null,
+                'id_cliente' => null,
                 'estado'      => 'activo',
                 'created_at'  => $now,
             ]);
