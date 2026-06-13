@@ -66,6 +66,7 @@
                             <th>Estado</th>
                             <th>Firmado</th>
                             <th>Enlace de firma</th>
+                            <th>WhatsApp</th>
                             <th class="text-end">Email</th>
                         </tr>
                     </thead>
@@ -74,13 +75,15 @@
                         $firmantes = array_filter($asistentes, static fn ($a) => (int) $a['requiere_firma'] === 1 && $a['asistencia'] === 'asiste');
                         ?>
                         <?php if ($firmantes === []): ?>
-                            <tr><td colspan="5" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
+                            <tr><td colspan="6" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($firmantes as $a): ?>
                             <?php
                                 $estado = (string) $a['firma_estado'];
                                 $badge = $estado === 'firmada' ? 'bg-success' : ($estado === 'rechazada' ? 'bg-danger' : 'bg-warning text-dark');
                                 $tok = $tokens[(int) $a['id_asistente']] ?? null;
+                                $url = $tok !== null ? base_url('firmar/' . $tok['token']) : '';
+                                $whatsappTexto = 'Hola ' . ($a['nombre'] ?? '') . ', por favor firma el acta ' . ($acta['numero'] ?? '') . ' de ' . ($cliente['nombre'] ?? 'la copropiedad') . ': ' . $url;
                             ?>
                             <tr>
                                 <td>
@@ -93,13 +96,19 @@
                                     <?php if ($estado === 'firmada'): ?>
                                         <span class="text-success small">✔ Firmado</span>
                                     <?php elseif ($tok !== null && empty($tok['usado_at'])): ?>
-                                        <?php $url = base_url('firmar/' . $tok['token']); ?>
                                         <div class="input-group input-group-sm">
                                             <input type="text" class="form-control" value="<?= esc($url) ?>" readonly onclick="this.select()">
                                             <a class="btn btn-outline-primary" href="<?= esc($url) ?>" target="_blank" rel="noopener">Abrir</a>
                                         </div>
                                     <?php else: ?>
                                         <span class="text-muted small">Sin enlace (cierra el acta)</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($estado !== 'firmada' && $tok !== null && empty($tok['usado_at'])): ?>
+                                        <a class="btn btn-sm btn-outline-success" href="https://wa.me/?text=<?= rawurlencode($whatsappTexto) ?>" target="_blank" rel="noopener">WhatsApp</a>
+                                    <?php else: ?>
+                                        <span class="text-muted small">—</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end">
