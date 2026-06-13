@@ -55,6 +55,10 @@
             <button type="submit" class="btn btn-primary w-100 fw-semibold">Ingresar</button>
         </form>
 
+        <div class="text-center mt-3">
+            <a href="<?= base_url('verificar') ?>" class="small text-decoration-none">Verificar acta firmada</a>
+        </div>
+
         <!-- PWA install -->
         <div class="pwa-install-section" id="pwaInstallSection">
             <img src="<?= base_url('assets/icons/icon-192.png') ?>" alt="App" class="pwa-install-icon">

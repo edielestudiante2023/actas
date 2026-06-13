@@ -55,4 +55,11 @@ class ActaModel extends Model
             ->where('id_cliente', $idCliente)
             ->first();
     }
+
+    public function findFirmadaPorCodigo(string $codigo): ?array
+    {
+        return $this->where('codigo_verificacion', $codigo)
+            ->where('estado', 'firmada')
+            ->first();
+    }
 }

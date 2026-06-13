@@ -7,6 +7,9 @@ $routes->get('/', 'Auth::loginForm');
 $routes->get('login', 'Auth::loginForm');
 $routes->post('login', 'Auth::login');
 $routes->get('logout', 'Auth::logout');
+$routes->get('verificar', 'ActaVerificacion::form');
+$routes->post('verificar', 'ActaVerificacion::buscar');
+$routes->get('verificar/(:segment)', 'ActaVerificacion::resultado/$1');
 
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
