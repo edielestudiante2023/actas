@@ -77,6 +77,7 @@
                                     <?php else: ?>
                                         <span class="text-muted small me-2">Solo lectura</span>
                                     <?php endif; ?>
+                                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/firmas') ?>" class="btn btn-sm btn-outline-success">Firmas</a>
                                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">PDF</a>
                                 </td>
                             </tr>

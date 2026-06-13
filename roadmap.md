@@ -108,13 +108,13 @@
 - [ ] Estados del acta: `borrador → pendiente_firma → firmada` (+ `en_edicion`, `anulada`)
 
 ## Fase 4 — Firmas (email + WhatsApp)
-- [ ] Migraciones: `tbl_actas_tokens`, `tbl_acta_solicitudes_reapertura`, `tbl_acta_solicitudes_marcar_ausente`
-- [ ] Generación de tokens de firma por asistente
-- [ ] Página pública de firma por token (canvas, guarda base64 + IP + fecha)
-- [ ] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma)
-- [ ] Envío de enlaces de firma por **WhatsApp**
-- [ ] Panel de estado de firmas (reenviar / cancelar)
-- [ ] Cierre automático del acta al completar firmas + `codigo_verificacion`
+- [x] Migración `tbl_actas_tokens` (tokens de firma) — solicitudes reapertura/ausente pendientes
+- [x] Generación de tokens de firma por asistente (al cerrar el acta)
+- [x] Página pública de firma por token (canvas, guarda base64 + IP + fecha)
+- [ ] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma) ← **sub-paso 2**
+- [ ] Envío de enlaces de firma por **WhatsApp** ← **sub-paso 3**
+- [x] Panel de estado de firmas (con enlaces para copiar; reenviar/cancelar pendiente)
+- [x] Cierre automático del acta al completar firmas + `codigo_verificacion`
 - [ ] Verificación pública del acta por código
 - [ ] Solicitud de reapertura y marcar ausente (aprobación por token)
 

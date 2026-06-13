@@ -51,6 +51,13 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->get('(:num)/anexos/(:num)/descargar', 'ActaAnexos::download/$1/$2');
     $routes->post('(:num)/anexos/(:num)/eliminar', 'ActaAnexos::delete/$1/$2');
     $routes->get('(:num)/pdf', 'ActaPdf::pdf/$1');
+    $routes->post('(:num)/cerrar', 'ActaFirmas::cerrar/$1');
+    $routes->get('(:num)/firmas', 'ActaFirmas::estado/$1');
     $routes->get('(:num)/editar', 'Actas::edit/$1');
     $routes->post('(:num)', 'Actas::update/$1');
 });
+
+// Firma pública por token (SIN autenticación).
+$routes->get('firmar/(:segment)', 'ActaFirmaPublica::firmar/$1');
+$routes->post('firmar/(:segment)', 'ActaFirmaPublica::procesarFirma/$1');
+$routes->get('firma-exitosa', 'ActaFirmaPublica::exitosa');
