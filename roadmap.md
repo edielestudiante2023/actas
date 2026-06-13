@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: compromisos/tareas del acta con responsable, vencimiento, estado y avance. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: envío de enlaces de firma por email con SendGrid v7. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -40,9 +40,9 @@
 
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Completar votaciones/decisiones del acta.
-3. Integrar logo/datos del cliente en encabezados del acta.
-4. Recuperación de contraseña por email (usar `EmailService` SendGrid v7 — ver Fase 4).
+2. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
+3. Completar envío de enlaces por WhatsApp.
+4. Recuperación de contraseña por email (usa `EmailService` SendGrid v7).
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
@@ -58,7 +58,7 @@
 - URLs salen con `/index.php/...`. Para URLs limpias: `Config/App.php` → `$indexPage = ''` (pendiente, opcional).
 - Credenciales: BD `D:\DESARROLLO\KEYS\sql.txt`, SSH `D:\DESARROLLO\KEYS\ssh.txt`. Nunca commitear; van en `.env` (gitignored).
 
-**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo,Actas,ActaAsistentes,ActaCompromisos}.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/ClienteScope.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel,ActaModel,ActaAsistenteModel,ActaCompromisoModel,ActaAuditoriaModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*,actas/*}.php`, `app/Database/Migrations/2026-06-12-*` (incluye núcleo de actas), `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
+**Archivos clave creados:** `app/Controllers/{Auth,Dashboard,Clientes,Usuarios,ClienteConsejo,Actas,ActaAsistentes,ActaCompromisos,ActaFirmas}.php`, `app/Commands/TestEmail.php`, `app/Filters/{AuthFilter,RoleFilter,ClienteFilter}.php`, `app/Libraries/{ClienteScope,EmailService}.php`, `app/Models/{UsuarioModel,ClienteModel,RolModel,UsuarioRolModel,ClienteConsejoModel,ActaModel,ActaAsistenteModel,ActaCompromisoModel,ActaAuditoriaModel}.php`, `app/Views/{auth/login,dashboard/index,clientes/*,usuarios/*,actas/*,emails/*}.php`, `app/Database/Migrations/2026-06-12-*` (incluye núcleo de actas), `app/Database/Seeds/{Roles,Superadmin,Database}Seeder.php`, `public/{manifest_login.json,sw_login.js,assets/icons/*}`.
 
 ---
 
@@ -111,7 +111,7 @@
 - [x] Migración `tbl_actas_tokens` (tokens de firma) — solicitudes reapertura/ausente pendientes
 - [x] Generación de tokens de firma por asistente (al cerrar el acta)
 - [x] Página pública de firma por token (canvas, guarda base64 + IP + fecha)
-- [ ] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma) ← **sub-paso 2**
+- [x] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma) — pendiente configurar API key/remitente para validar envío real
 - [ ] Envío de enlaces de firma por **WhatsApp** ← **sub-paso 3**
 - [x] Panel de estado de firmas (con enlaces para copiar; reenviar/cancelar pendiente)
 - [x] Cierre automático del acta al completar firmas + `codigo_verificacion`

@@ -50,6 +50,13 @@
             </form>
         <?php endif; ?>
 
+        <?php if ($acta['estado'] === 'pendiente_firma'): ?>
+            <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/email') ?>" method="post" class="mb-3" onsubmit="return confirm('Se enviará el enlace a todos los firmantes pendientes con correo válido. ¿Continuar?');">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-outline-primary">Enviar pendientes por email</button>
+            </form>
+        <?php endif; ?>
+
         <div class="card">
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
@@ -59,6 +66,7 @@
                             <th>Estado</th>
                             <th>Firmado</th>
                             <th>Enlace de firma</th>
+                            <th class="text-end">Email</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +74,7 @@
                         $firmantes = array_filter($asistentes, static fn ($a) => (int) $a['requiere_firma'] === 1 && $a['asistencia'] === 'asiste');
                         ?>
                         <?php if ($firmantes === []): ?>
-                            <tr><td colspan="4" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
+                            <tr><td colspan="5" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($firmantes as $a): ?>
                             <?php
@@ -92,6 +100,18 @@
                                         </div>
                                     <?php else: ?>
                                         <span class="text-muted small">Sin enlace (cierra el acta)</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="text-end">
+                                    <?php if ($estado !== 'firmada' && $tok !== null && empty($tok['usado_at']) && ! empty($a['email']) && $acta['estado'] === 'pendiente_firma'): ?>
+                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/email/' . $a['id_asistente']) ?>" method="post">
+                                            <?= csrf_field() ?>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Enviar</button>
+                                        </form>
+                                    <?php elseif (empty($a['email'])): ?>
+                                        <span class="text-muted small">Sin correo</span>
+                                    <?php else: ?>
+                                        <span class="text-muted small">—</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>

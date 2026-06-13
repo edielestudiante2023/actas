@@ -53,6 +53,8 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->get('(:num)/pdf', 'ActaPdf::pdf/$1');
     $routes->post('(:num)/cerrar', 'ActaFirmas::cerrar/$1');
     $routes->get('(:num)/firmas', 'ActaFirmas::estado/$1');
+    $routes->post('(:num)/firmas/email', 'ActaFirmas::enviarEmailTodos/$1');
+    $routes->post('(:num)/firmas/email/(:num)', 'ActaFirmas::enviarEmailIndividual/$1/$2');
     $routes->get('(:num)/editar', 'Actas::edit/$1');
     $routes->post('(:num)', 'Actas::update/$1');
 });

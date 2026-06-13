@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Libraries\ClienteScope;
+use App\Libraries\EmailService;
 use App\Models\ActaAsistenteModel;
 use App\Models\ActaAuditoriaModel;
 use App\Models\ActaModel;
 use App\Models\ActaTokenModel;
+use Throwable;
 
 class ActaFirmas extends BaseController
 {
@@ -101,6 +103,84 @@ class ActaFirmas extends BaseController
         return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Acta cerrada. Se generaron los enlaces de firma.');
     }
 
+    public function enviarEmailTodos(int $idActa)
+    {
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
+        }
+
+        if ($acta['estado'] !== 'pendiente_firma') {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Solo se envían correos cuando el acta está pendiente de firma.');
+        }
+
+        $asistentes = $this->asistentes->asistentesActa($idActa);
+        $tokens = $this->tokens->firmaTokensPorAsistente($idActa);
+        $enviados = 0;
+        $omitidos = 0;
+        $errores = [];
+
+        foreach ($asistentes as $asistente) {
+            if (! $this->puedeRecibirEmail($asistente, $tokens)) {
+                $omitidos++;
+                continue;
+            }
+
+            try {
+                $this->enviarEmailFirma($acta, $asistente, $tokens[(int) $asistente['id_asistente']]);
+                $enviados++;
+            } catch (Throwable $e) {
+                $errores[] = $asistente['nombre'] . ': ' . $e->getMessage();
+            }
+        }
+
+        if ($enviados > 0) {
+            $this->auditoria->registrar($idActa, 'enviar_firmas_email', 'Correos enviados: ' . $enviados . '. Omitidos: ' . $omitidos . '.');
+        }
+
+        if ($errores !== []) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Enviados: ' . $enviados . '. Errores: ' . implode(' | ', array_slice($errores, 0, 3)));
+        }
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Correos enviados: ' . $enviados . '. Omitidos: ' . $omitidos . '.');
+    }
+
+    public function enviarEmailIndividual(int $idActa, int $idAsistente)
+    {
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
+        }
+
+        if ($acta['estado'] !== 'pendiente_firma') {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Solo se envían correos cuando el acta está pendiente de firma.');
+        }
+
+        $asistente = $this->asistentes
+            ->where('id_acta', $idActa)
+            ->where('id_asistente', $idAsistente)
+            ->first();
+
+        if ($asistente === null) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Firmante no encontrado.');
+        }
+
+        $tokens = $this->tokens->firmaTokensPorAsistente($idActa);
+        if (! $this->puedeRecibirEmail($asistente, $tokens)) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'El firmante no tiene correo válido, token vigente o ya firmó.');
+        }
+
+        try {
+            $this->enviarEmailFirma($acta, $asistente, $tokens[$idAsistente]);
+        } catch (Throwable $e) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', $e->getMessage());
+        }
+
+        $this->auditoria->registrar($idActa, 'enviar_firma_email', 'Correo enviado a: ' . ($asistente['email'] ?? '') . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Correo enviado a ' . $asistente['nombre'] . '.');
+    }
+
     private function actaContext(int $idActa): ?array
     {
         $this->scope->syncActiveSession();
@@ -110,5 +190,35 @@ class ActaFirmas extends BaseController
         }
 
         return $this->actas->findForCliente($idActa, $idCliente);
+    }
+
+    private function puedeRecibirEmail(array $asistente, array $tokens): bool
+    {
+        $idAsistente = (int) $asistente['id_asistente'];
+        $token = $tokens[$idAsistente] ?? null;
+
+        return (int) $asistente['requiere_firma'] === 1
+            && $asistente['asistencia'] === 'asiste'
+            && $asistente['firma_estado'] !== 'firmada'
+            && $token !== null
+            && empty($token['usado_at'])
+            && ! empty($asistente['email'])
+            && filter_var((string) $asistente['email'], FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    private function enviarEmailFirma(array $acta, array $asistente, array $token): void
+    {
+        $cliente = $this->scope->active();
+        $firmaUrl = base_url('firmar/' . $token['token']);
+        $html = view('emails/firma_enlace', [
+            'nombre'   => $asistente['nombre'] ?? '',
+            'cliente'  => $cliente,
+            'acta'     => $acta,
+            'firmaUrl' => $firmaUrl,
+            'expira'   => ! empty($token['expires_at']) ? date('d/m/Y H:i', strtotime((string) $token['expires_at'])) : null,
+        ]);
+
+        $subject = 'Firma pendiente - Acta ' . ($acta['numero'] ?? $acta['id_acta']);
+        (new EmailService())->sendHtml((string) $asistente['email'], (string) $asistente['nombre'], $subject, $html);
     }
 }
