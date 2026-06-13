@@ -67,6 +67,7 @@
                             <th>Firmado</th>
                             <th>Enlace de firma</th>
                             <th>WhatsApp</th>
+                            <th>Enlace</th>
                             <th class="text-end">Email</th>
                         </tr>
                     </thead>
@@ -75,14 +76,15 @@
                         $firmantes = array_filter($asistentes, static fn ($a) => (int) $a['requiere_firma'] === 1 && $a['asistencia'] === 'asiste');
                         ?>
                         <?php if ($firmantes === []): ?>
-                            <tr><td colspan="6" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
+                            <tr><td colspan="7" class="text-center text-muted py-4">Aún no hay firmantes. Cierra el acta para generar enlaces.</td></tr>
                         <?php endif; ?>
                         <?php foreach ($firmantes as $a): ?>
                             <?php
                                 $estado = (string) $a['firma_estado'];
                                 $badge = $estado === 'firmada' ? 'bg-success' : ($estado === 'rechazada' ? 'bg-danger' : 'bg-warning text-dark');
                                 $tok = $tokens[(int) $a['id_asistente']] ?? null;
-                                $url = $tok !== null ? base_url('firmar/' . $tok['token']) : '';
+                                $tokenVigente = $tok !== null && empty($tok['usado_at']) && (empty($tok['expires_at']) || strtotime((string) $tok['expires_at']) >= time());
+                                $url = $tokenVigente ? base_url('firmar/' . $tok['token']) : '';
                                 $whatsappTexto = 'Hola ' . ($a['nombre'] ?? '') . ', por favor firma el acta ' . ($acta['numero'] ?? '') . ' de ' . ($cliente['nombre'] ?? 'la copropiedad') . ': ' . $url;
                             ?>
                             <tr>
@@ -95,7 +97,7 @@
                                 <td style="min-width:280px;">
                                     <?php if ($estado === 'firmada'): ?>
                                         <span class="text-success small">✔ Firmado</span>
-                                    <?php elseif ($tok !== null && empty($tok['usado_at'])): ?>
+                                    <?php elseif ($tokenVigente): ?>
                                         <div class="input-group input-group-sm">
                                             <input type="text" class="form-control" value="<?= esc($url) ?>" readonly onclick="this.select()">
                                             <a class="btn btn-outline-primary" href="<?= esc($url) ?>" target="_blank" rel="noopener">Abrir</a>
@@ -105,17 +107,41 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php if ($estado !== 'firmada' && $tok !== null && empty($tok['usado_at'])): ?>
+                                    <?php if ($estado !== 'firmada' && $tokenVigente): ?>
                                         <a class="btn btn-sm btn-outline-success" href="https://wa.me/?text=<?= rawurlencode($whatsappTexto) ?>" target="_blank" rel="noopener">WhatsApp</a>
                                     <?php else: ?>
                                         <span class="text-muted small">—</span>
                                     <?php endif; ?>
                                 </td>
+                                <td>
+                                    <?php if ($estado !== 'firmada' && $acta['estado'] === 'pendiente_firma'): ?>
+                                        <div class="d-inline-flex gap-1">
+                                            <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/enlace/' . $a['id_asistente'] . '/regenerar') ?>" method="post">
+                                                <?= csrf_field() ?>
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary"><?= $tokenVigente ? 'Regenerar' : 'Generar' ?></button>
+                                            </form>
+                                            <?php if ($tokenVigente): ?>
+                                                <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/enlace/' . $a['id_asistente'] . '/cancelar') ?>" method="post" onsubmit="return confirm('Este enlace dejará de funcionar. ¿Continuar?');">
+                                                    <?= csrf_field() ?>
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="text-muted small">—</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="text-end">
-                                    <?php if ($estado !== 'firmada' && $tok !== null && empty($tok['usado_at']) && ! empty($a['email']) && $acta['estado'] === 'pendiente_firma'): ?>
+                                    <?php if ($estado !== 'firmada' && $tokenVigente && ! empty($a['email']) && $acta['estado'] === 'pendiente_firma'): ?>
                                         <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/email/' . $a['id_asistente']) ?>" method="post">
                                             <?= csrf_field() ?>
                                             <button type="submit" class="btn btn-sm btn-outline-primary">Enviar</button>
+                                        </form>
+                                    <?php elseif ($estado !== 'firmada' && ! empty($a['email']) && $acta['estado'] === 'pendiente_firma'): ?>
+                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/enlace/' . $a['id_asistente'] . '/regenerar') ?>" method="post">
+                                            <?= csrf_field() ?>
+                                            <input type="hidden" name="enviar_email" value="1">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Generar y enviar</button>
                                         </form>
                                     <?php elseif (empty($a['email'])): ?>
                                         <span class="text-muted small">Sin correo</span>

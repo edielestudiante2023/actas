@@ -70,6 +70,53 @@ class ActaTokenModel extends Model
             ->delete();
     }
 
+    public function findFirmaToken(int $idActa, int $idAsistente): ?array
+    {
+        return $this->where('id_acta', $idActa)
+            ->where('id_asistente', $idAsistente)
+            ->where('tipo', 'firmar_acta')
+            ->first();
+    }
+
+    public function cancelarFirmaToken(int $idActa, int $idAsistente, string $ip): bool
+    {
+        $token = $this->findFirmaToken($idActa, $idAsistente);
+        if ($token === null || ! empty($token['usado_at'])) {
+            return false;
+        }
+
+        return $this->update($token['id_token'], [
+            'usado_at' => date('Y-m-d H:i:s'),
+            'ip_uso'   => $ip,
+        ]);
+    }
+
+    public function regenerarFirmaToken(int $idActa, int $idAsistente, int $idCliente, int $diasExpira): array
+    {
+        $token = $this->findFirmaToken($idActa, $idAsistente);
+        $data = [
+            'token'      => $this->nuevoToken(),
+            'expires_at' => date('Y-m-d H:i:s', time() + $diasExpira * 86400),
+            'usado_at'   => null,
+            'ip_uso'     => null,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        if ($token === null) {
+            $data['tipo'] = 'firmar_acta';
+            $data['id_acta'] = $idActa;
+            $data['id_asistente'] = $idAsistente;
+            $data['id_cliente'] = $idCliente;
+            $idToken = $this->insert($data, true);
+
+            return $this->find((int) $idToken);
+        }
+
+        $this->update($token['id_token'], $data);
+
+        return $this->find((int) $token['id_token']);
+    }
+
     public function nuevoToken(): string
     {
         return bin2hex(random_bytes(32));

@@ -181,6 +181,49 @@ class ActaFirmas extends BaseController
         return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Correo enviado a ' . $asistente['nombre'] . '.');
     }
 
+    public function regenerarEnlace(int $idActa, int $idAsistente)
+    {
+        $context = $this->firmanteContext($idActa, $idAsistente);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $acta = $context['acta'];
+        $asistente = $context['asistente'];
+        $token = $this->tokens->regenerarFirmaToken($idActa, $idAsistente, (int) $acta['id_cliente'], self::DIAS_EXPIRA);
+        $this->auditoria->registrar($idActa, 'regenerar_enlace_firma', 'Firmante: ' . ($asistente['nombre'] ?? '') . '.');
+
+        if ($this->request->getPost('enviar_email') === '1' && ! empty($asistente['email'])) {
+            try {
+                $this->enviarEmailFirma($acta, $asistente, $token);
+                $this->auditoria->registrar($idActa, 'reenviar_firma_email', 'Correo reenviado a: ' . ($asistente['email'] ?? '') . '.');
+
+                return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Enlace regenerado y enviado por email a ' . $asistente['nombre'] . '.');
+            } catch (Throwable $e) {
+                return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'El enlace se regeneró, pero no se pudo enviar email: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Enlace regenerado para ' . $asistente['nombre'] . '.');
+    }
+
+    public function cancelarEnlace(int $idActa, int $idAsistente)
+    {
+        $context = $this->firmanteContext($idActa, $idAsistente);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $asistente = $context['asistente'];
+        if (! $this->tokens->cancelarFirmaToken($idActa, $idAsistente, $this->request->getIPAddress())) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'No hay enlace vigente para cancelar.');
+        }
+
+        $this->auditoria->registrar($idActa, 'cancelar_enlace_firma', 'Firmante: ' . ($asistente['nombre'] ?? '') . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Enlace cancelado para ' . $asistente['nombre'] . '.');
+    }
+
     private function actaContext(int $idActa): ?array
     {
         $this->scope->syncActiveSession();
@@ -190,6 +233,38 @@ class ActaFirmas extends BaseController
         }
 
         return $this->actas->findForCliente($idActa, $idCliente);
+    }
+
+    private function firmanteContext(int $idActa, int $idAsistente): array
+    {
+        $redirect = '/actas/' . $idActa . '/firmas';
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return ['error' => 'Acta no encontrada para el cliente activo.', 'redirect' => '/actas', 'acta' => null, 'asistente' => null];
+        }
+
+        if ($acta['estado'] !== 'pendiente_firma') {
+            return ['error' => 'Solo puedes administrar enlaces cuando el acta está pendiente de firma.', 'redirect' => $redirect, 'acta' => $acta, 'asistente' => null];
+        }
+
+        $asistente = $this->asistentes
+            ->where('id_acta', $idActa)
+            ->where('id_asistente', $idAsistente)
+            ->first();
+
+        if ($asistente === null) {
+            return ['error' => 'Firmante no encontrado.', 'redirect' => $redirect, 'acta' => $acta, 'asistente' => null];
+        }
+
+        if ((int) $asistente['requiere_firma'] !== 1 || $asistente['asistencia'] !== 'asiste') {
+            return ['error' => 'El asistente no requiere firma activa.', 'redirect' => $redirect, 'acta' => $acta, 'asistente' => $asistente];
+        }
+
+        if ($asistente['firma_estado'] === 'firmada') {
+            return ['error' => 'El firmante ya firmó el acta.', 'redirect' => $redirect, 'acta' => $acta, 'asistente' => $asistente];
+        }
+
+        return ['error' => null, 'redirect' => $redirect, 'acta' => $acta, 'asistente' => $asistente];
     }
 
     private function puedeRecibirEmail(array $asistente, array $tokens): bool

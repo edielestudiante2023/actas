@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: recuperación de contraseña por email con tokens seguros y `EmailService`. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: regenerar y cancelar enlaces de firma desde el panel de firmas. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -41,8 +41,8 @@
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
 2. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
-3. Reenviar/cancelar enlaces de firma.
-4. Solicitudes de reapertura y marcar ausente.
+3. Solicitudes de reapertura y marcar ausente.
+4. Mostrar imágenes de firma en el PDF.
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
@@ -113,7 +113,7 @@
 - [x] Página pública de firma por token (canvas, guarda base64 + IP + fecha)
 - [x] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma) — pendiente configurar API key/remitente para validar envío real
 - [x] Envío de enlaces de firma por **WhatsApp** — compartir enlace con `wa.me`, sin API externa
-- [x] Panel de estado de firmas (con enlaces para copiar; reenviar/cancelar pendiente)
+- [x] Panel de estado de firmas (copiar, email, WhatsApp, regenerar y cancelar enlaces)
 - [x] Cierre automático del acta al completar firmas + `codigo_verificacion`
 - [x] Verificación pública del acta por código
 - [ ] Solicitud de reapertura y marcar ausente (aprobación por token)
