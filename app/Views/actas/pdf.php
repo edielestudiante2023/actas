@@ -8,6 +8,17 @@ $fmtFecha = static function (?string $v): string {
     return $t ? date('d/m/Y', $t) : esc($v);
 };
 $estadoTxt = ucfirst(str_replace('_', ' ', (string) $acta['estado']));
+$firmaValida = static function (?string $firma): bool {
+    return is_string($firma) && preg_match('/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/', $firma) === 1;
+};
+$fmtFechaHora = static function (?string $v): string {
+    if (empty($v)) {
+        return '—';
+    }
+    $t = strtotime($v);
+
+    return $t ? date('d/m/Y H:i', $t) : esc($v);
+};
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -34,6 +45,13 @@ $estadoTxt = ucfirst(str_replace('_', ' ', (string) $acta['estado']));
         .b-no { background: #c0392b; }
         .b-w { background: #c9a24b; }
         .pre { white-space: pre-wrap; }
+        .signatures { width: 100%; border-collapse: separate; border-spacing: 8px; margin-top: 4px; }
+        .sig-cell { width: 50%; border: 1px solid #d8dde8; padding: 8px; vertical-align: top; height: 116px; }
+        .sig-box { height: 54px; border-bottom: 1px solid #9aa4b2; text-align: center; margin-bottom: 5px; }
+        .sig-img { max-width: 210px; max-height: 52px; }
+        .sig-placeholder { color: #6b7280; font-size: 10px; padding-top: 18px; }
+        .sig-name { font-weight: bold; color: #16203a; }
+        .sig-meta { font-size: 9px; color: #6b7280; line-height: 1.35; }
         .foot { margin-top: 18px; border-top: 1px solid #e2e6ee; padding-top: 6px; font-size: 9px; color: #6b7280; }
     </style>
 </head>
@@ -158,6 +176,47 @@ $estadoTxt = ucfirst(str_replace('_', ' ', (string) $acta['estado']));
     <?php if (! empty($acta['observaciones'])): ?>
         <h2>Observaciones</h2>
         <div class="pre"><?= esc($acta['observaciones']) ?></div>
+    <?php endif; ?>
+
+    <?php
+    $firmantesPdf = array_values(array_filter($asistentes, static fn ($a) => (int) $a['requiere_firma'] === 1));
+    ?>
+    <?php if ($firmantesPdf !== []): ?>
+        <h2>Firmas</h2>
+        <table class="signatures">
+            <tbody>
+                <?php foreach (array_chunk($firmantesPdf, 2) as $fila): ?>
+                    <tr>
+                        <?php foreach ($fila as $firmante): ?>
+                            <?php
+                                $estadoFirma = (string) ($firmante['firma_estado'] ?? 'pendiente');
+                                $firmado = $estadoFirma === 'firmada' && $firmaValida($firmante['firma_imagen'] ?? null);
+                                $estadoVisible = $estadoFirma === 'firmada' ? 'Firmado' : ucfirst(str_replace('_', ' ', $estadoFirma));
+                            ?>
+                            <td class="sig-cell">
+                                <div class="sig-box">
+                                    <?php if ($firmado): ?>
+                                        <img src="<?= $firmante['firma_imagen'] ?>" class="sig-img" alt="">
+                                    <?php else: ?>
+                                        <div class="sig-placeholder"><?= esc($estadoVisible) ?></div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="sig-name"><?= esc($firmante['nombre'] ?? '') ?></div>
+                                <div class="sig-meta">
+                                    <?= esc($firmante['cargo'] ?? 'Firmante') ?><br>
+                                    Estado: <?= esc($estadoVisible) ?><br>
+                                    Fecha: <?= $fmtFechaHora($firmante['firma_at'] ?? null) ?>
+                                    <?php if (! empty($firmante['firma_ip'])): ?><br>IP: <?= esc($firmante['firma_ip']) ?><?php endif; ?>
+                                </div>
+                            </td>
+                        <?php endforeach; ?>
+                        <?php if (count($fila) === 1): ?>
+                            <td class="sig-cell"></td>
+                        <?php endif; ?>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     <?php endif; ?>
 
     <?php if (! empty($anexos)): ?>
