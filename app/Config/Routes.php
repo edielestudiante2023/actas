@@ -46,6 +46,10 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->get('(:num)/votaciones', 'ActaVotaciones::index/$1');
     $routes->post('(:num)/votaciones', 'ActaVotaciones::create/$1');
     $routes->post('(:num)/votaciones/(:num)', 'ActaVotaciones::update/$1/$2');
+    $routes->get('(:num)/anexos', 'ActaAnexos::index/$1');
+    $routes->post('(:num)/anexos', 'ActaAnexos::create/$1');
+    $routes->get('(:num)/anexos/(:num)/descargar', 'ActaAnexos::download/$1/$2');
+    $routes->post('(:num)/anexos/(:num)/eliminar', 'ActaAnexos::delete/$1/$2');
     $routes->get('(:num)/pdf', 'ActaPdf::pdf/$1');
     $routes->get('(:num)/editar', 'Actas::edit/$1');
     $routes->post('(:num)', 'Actas::update/$1');

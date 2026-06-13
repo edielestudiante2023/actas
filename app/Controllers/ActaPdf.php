@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Libraries\ClienteScope;
+use App\Models\ActaAnexoModel;
 use App\Models\ActaAsistenteModel;
 use App\Models\ActaCompromisoModel;
 use App\Models\ActaModel;
@@ -17,6 +18,7 @@ class ActaPdf extends BaseController
     private ActaAsistenteModel $asistentes;
     private ActaCompromisoModel $compromisos;
     private ActaVotacionModel $votaciones;
+    private ActaAnexoModel $anexos;
 
     public function __construct()
     {
@@ -25,6 +27,7 @@ class ActaPdf extends BaseController
         $this->asistentes = new ActaAsistenteModel();
         $this->compromisos = new ActaCompromisoModel();
         $this->votaciones = new ActaVotacionModel();
+        $this->anexos = new ActaAnexoModel();
     }
 
     public function pdf(int $idActa)
@@ -49,6 +52,7 @@ class ActaPdf extends BaseController
             'quorum'      => $this->asistentes->resumenQuorum($idActa),
             'compromisos' => $this->compromisos->compromisosActa($idActa),
             'votaciones'  => $this->votaciones->votacionesActa($idActa),
+            'anexos'      => $this->anexos->anexosActa($idActa),
             'logo'        => $this->logoDataUri($cliente),
         ]);
 

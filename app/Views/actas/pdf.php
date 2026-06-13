@@ -160,6 +160,24 @@ $estadoTxt = ucfirst(str_replace('_', ' ', (string) $acta['estado']));
         <div class="pre"><?= esc($acta['observaciones']) ?></div>
     <?php endif; ?>
 
+    <?php if (! empty($anexos)): ?>
+        <h2>Anexos</h2>
+        <table class="data">
+            <thead>
+                <tr><th>#</th><th>Nombre</th><th>Tipo</th></tr>
+            </thead>
+            <tbody>
+                <?php foreach ($anexos as $i => $anexo): ?>
+                    <tr>
+                        <td><?= $i + 1 ?></td>
+                        <td><?= esc($anexo['nombre']) ?></td>
+                        <td><?= esc($anexo['mime'] ?? '—') ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
     <div class="foot">
         <?php if (! empty($acta['codigo_verificacion'])): ?>
             Código de verificación: <strong><?= esc($acta['codigo_verificacion']) ?></strong> ·

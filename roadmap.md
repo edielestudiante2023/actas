@@ -104,7 +104,7 @@
 - [x] Desarrollo / conclusiones / observaciones
 - [x] **Compromisos/tareas** (responsable, vencimiento, estado, avance)
 - [x] **Votaciones/decisiones** (favor/contra/abstención, resultado por mayoría)
-- [ ] Anexos (adjuntos)
+- [x] Anexos (adjuntos) — subida/descarga/eliminar, almacenamiento en writable, listados en el PDF
 - [ ] Estados del acta: `borrador → pendiente_firma → firmada` (+ `en_edicion`, `anulada`)
 
 ## Fase 4 — Firmas (email + WhatsApp)
