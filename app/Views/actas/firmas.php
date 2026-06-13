@@ -155,6 +155,131 @@
                 </table>
             </div>
         </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <strong>Solicitudes para marcar ausente</strong>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Firmante</th>
+                                        <th>Motivo</th>
+                                        <th>Estado</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($solicitudesAusente)): ?>
+                                        <tr><td colspan="4" class="text-center text-muted py-4">No hay solicitudes.</td></tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($solicitudesAusente as $s): ?>
+                                        <?php
+                                            $estadoSolicitud = (string) $s['estado'];
+                                            $badgeSolicitud = $estadoSolicitud === 'aprobada' ? 'bg-success' : ($estadoSolicitud === 'rechazada' ? 'bg-danger' : 'bg-warning text-dark');
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold"><?= esc($s['asistente_nombre'] ?? $s['solicitante_nombre'] ?? '') ?></div>
+                                                <div class="small text-muted"><?= esc($s['asistente_cargo'] ?? $s['solicitante_email'] ?? '') ?></div>
+                                            </td>
+                                            <td class="small" style="min-width:220px;"><?= esc($s['motivo']) ?></td>
+                                            <td><span class="badge <?= $badgeSolicitud ?>"><?= esc($estadoSolicitud) ?></span></td>
+                                            <td class="text-end">
+                                                <?php if ($estadoSolicitud === 'pendiente'): ?>
+                                                    <div class="d-inline-flex gap-1">
+                                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/solicitudes-ausente/' . $s['id_solicitud'] . '/aprobar') ?>" method="post" onsubmit="return confirm('El firmante quedará marcado como ausente. ¿Continuar?');">
+                                                            <?= csrf_field() ?>
+                                                            <button type="submit" class="btn btn-sm btn-outline-success">Aprobar</button>
+                                                        </form>
+                                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/solicitudes-ausente/' . $s['id_solicitud'] . '/rechazar') ?>" method="post">
+                                                            <?= csrf_field() ?>
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Rechazar</button>
+                                                        </form>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="text-muted small"><?= esc($s['resuelta_at'] ? substr((string) $s['resuelta_at'], 0, 16) : '—') ?></span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <strong>Solicitudes de reapertura</strong>
+                    </div>
+                    <div class="card-body">
+                        <?php if (in_array($acta['estado'], ['pendiente_firma', 'firmada'], true)): ?>
+                            <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/solicitudes-reapertura') ?>" method="post" class="mb-3">
+                                <?= csrf_field() ?>
+                                <label for="motivoReapertura" class="form-label">Motivo de reapertura</label>
+                                <textarea class="form-control" id="motivoReapertura" name="motivo" rows="3" maxlength="1000" required></textarea>
+                                <button type="submit" class="btn btn-outline-primary mt-2">Registrar solicitud</button>
+                            </form>
+                        <?php endif; ?>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Solicitante</th>
+                                        <th>Motivo</th>
+                                        <th>Estado</th>
+                                        <th class="text-end">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($solicitudesReapertura)): ?>
+                                        <tr><td colspan="4" class="text-center text-muted py-4">No hay solicitudes.</td></tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($solicitudesReapertura as $s): ?>
+                                        <?php
+                                            $estadoSolicitud = (string) $s['estado'];
+                                            $badgeSolicitud = $estadoSolicitud === 'aprobada' ? 'bg-success' : ($estadoSolicitud === 'rechazada' ? 'bg-danger' : 'bg-warning text-dark');
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold"><?= esc($s['solicitante_nombre'] ?? 'Usuario') ?></div>
+                                                <div class="small text-muted"><?= esc($s['created_at'] ? substr((string) $s['created_at'], 0, 16) : '') ?></div>
+                                            </td>
+                                            <td class="small" style="min-width:180px;"><?= esc($s['motivo']) ?></td>
+                                            <td><span class="badge <?= $badgeSolicitud ?>"><?= esc($estadoSolicitud) ?></span></td>
+                                            <td class="text-end">
+                                                <?php if ($estadoSolicitud === 'pendiente'): ?>
+                                                    <div class="d-inline-flex gap-1">
+                                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/solicitudes-reapertura/' . $s['id_solicitud'] . '/aprobar') ?>" method="post" onsubmit="return confirm('El acta volverá a estado en edición y se retirará el código de verificación. ¿Continuar?');">
+                                                            <?= csrf_field() ?>
+                                                            <button type="submit" class="btn btn-sm btn-outline-success">Aprobar</button>
+                                                        </form>
+                                                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/firmas/solicitudes-reapertura/' . $s['id_solicitud'] . '/rechazar') ?>" method="post">
+                                                            <?= csrf_field() ?>
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Rechazar</button>
+                                                        </form>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="text-muted small"><?= esc($s['resuelta_at'] ? substr((string) $s['resuelta_at'], 0, 16) : '—') ?></span>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>

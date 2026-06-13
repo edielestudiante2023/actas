@@ -39,11 +39,11 @@
 - Vistas con Bootstrap 5 por CDN (aún sin layout base; conviene crear `app/Views/layouts/base.php` y migrar login/dashboard a `extend/section`).
 
 **Próximo trabajo sugerido (orden):**
-1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
-2. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
-3. Solicitudes de reapertura y marcar ausente.
-4. Mostrar imágenes de firma en el PDF.
-5. Layout base + menú por rol.
+1. Mostrar imágenes de firma en el PDF.
+2. Exportar acta a Word (.doc).
+3. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
+4. Layout base + menú por rol.
+5. Manifest + service worker de la app principal (post-login).
 
 **Hitos inmediatos (siguiente ejecución):**
 - [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
@@ -108,7 +108,7 @@
 - [ ] Estados del acta: `borrador → pendiente_firma → firmada` (+ `en_edicion`, `anulada`)
 
 ## Fase 4 — Firmas (email + WhatsApp)
-- [x] Migración `tbl_actas_tokens` (tokens de firma) — solicitudes reapertura/ausente pendientes
+- [x] Migración `tbl_actas_tokens` (tokens de firma)
 - [x] Generación de tokens de firma por asistente (al cerrar el acta)
 - [x] Página pública de firma por token (canvas, guarda base64 + IP + fecha)
 - [x] `EmailService` con SendGrid SDK v7 (envío de enlaces de firma) — pendiente configurar API key/remitente para validar envío real
@@ -116,7 +116,7 @@
 - [x] Panel de estado de firmas (copiar, email, WhatsApp, regenerar y cancelar enlaces)
 - [x] Cierre automático del acta al completar firmas + `codigo_verificacion`
 - [x] Verificación pública del acta por código
-- [ ] Solicitud de reapertura y marcar ausente (aprobación por token)
+- [x] Solicitud de reapertura y marcar ausente (solicitud por enlace de firma y aprobación desde panel)
 
 ## Fase 5 — Exportación y notificaciones
 - [x] Exportar acta a **PDF** (Dompdf) — incluye logo, datos, asistentes/quórum, votaciones, compromisos

@@ -7,6 +7,8 @@ use App\Libraries\EmailService;
 use App\Models\ActaAsistenteModel;
 use App\Models\ActaAuditoriaModel;
 use App\Models\ActaModel;
+use App\Models\ActaSolicitudAusenteModel;
+use App\Models\ActaSolicitudReaperturaModel;
 use App\Models\ActaTokenModel;
 use Throwable;
 
@@ -17,6 +19,8 @@ class ActaFirmas extends BaseController
     private ClienteScope $scope;
     private ActaModel $actas;
     private ActaAsistenteModel $asistentes;
+    private ActaSolicitudAusenteModel $solicitudesAusente;
+    private ActaSolicitudReaperturaModel $solicitudesReapertura;
     private ActaTokenModel $tokens;
     private ActaAuditoriaModel $auditoria;
 
@@ -25,6 +29,8 @@ class ActaFirmas extends BaseController
         $this->scope = new ClienteScope();
         $this->actas = new ActaModel();
         $this->asistentes = new ActaAsistenteModel();
+        $this->solicitudesAusente = new ActaSolicitudAusenteModel();
+        $this->solicitudesReapertura = new ActaSolicitudReaperturaModel();
         $this->tokens = new ActaTokenModel();
         $this->auditoria = new ActaAuditoriaModel();
     }
@@ -50,6 +56,8 @@ class ActaFirmas extends BaseController
             'total'      => count($firmantes),
             'firmados'   => $firmados,
             'editable'   => in_array($acta['estado'], ['borrador', 'en_edicion'], true),
+            'solicitudesAusente' => $this->solicitudesAusente->solicitudesActa($idActa),
+            'solicitudesReapertura' => $this->solicitudesReapertura->solicitudesActa($idActa),
         ]);
     }
 
@@ -224,6 +232,136 @@ class ActaFirmas extends BaseController
         return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Enlace cancelado para ' . $asistente['nombre'] . '.');
     }
 
+    public function crearSolicitudReapertura(int $idActa)
+    {
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
+        }
+
+        if (! in_array($acta['estado'], ['pendiente_firma', 'firmada'], true)) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Solo se solicita reapertura cuando el acta está cerrada o firmada.');
+        }
+
+        $motivo = trim((string) $this->request->getPost('motivo'));
+        if (mb_strlen($motivo) < 10) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'El motivo de reapertura debe tener al menos 10 caracteres.');
+        }
+
+        $this->solicitudesReapertura->insert([
+            'id_acta'            => $idActa,
+            'id_asistente'       => null,
+            'id_cliente'         => $acta['id_cliente'],
+            'solicitante_nombre' => session('nombre'),
+            'solicitante_email'  => session('email'),
+            'motivo'             => $motivo,
+            'estado'             => 'pendiente',
+            'token_hash'         => $this->solicitudesReapertura->nuevoTokenHash(),
+            'expires_at'         => date('Y-m-d H:i:s', time() + 7 * 86400),
+            'created_at'         => date('Y-m-d H:i:s'),
+        ]);
+
+        $this->auditoria->registrar($idActa, 'solicitud_reapertura', 'Solicitada por: ' . (session('nombre') ?? 'Usuario') . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Solicitud de reapertura registrada.');
+    }
+
+    public function aprobarSolicitudAusente(int $idActa, int $idSolicitud)
+    {
+        $context = $this->solicitudAusenteContext($idActa, $idSolicitud);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $solicitud = $context['solicitud'];
+        $asistente = $this->asistentes
+            ->where('id_acta', $idActa)
+            ->where('id_asistente', $solicitud['id_asistente'])
+            ->first();
+
+        if ($asistente === null) {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'Firmante no encontrado.');
+        }
+
+        if ($asistente['firma_estado'] === 'firmada') {
+            return redirect()->to('/actas/' . $idActa . '/firmas')->with('error', 'El firmante ya firmó el acta.');
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $this->asistentes->update($asistente['id_asistente'], [
+            'asistencia'    => 'no_asiste',
+            'firma_estado'  => 'ausente',
+            'firma_imagen'  => null,
+            'firma_ip'      => null,
+            'firma_at'      => null,
+        ]);
+        $this->tokens->cancelarFirmaToken($idActa, (int) $asistente['id_asistente'], $this->request->getIPAddress());
+        $this->solicitudesAusente->update($idSolicitud, [
+            'estado'       => 'aprobada',
+            'resuelta_por' => session('id_usuario'),
+            'resuelta_at'  => $now,
+        ]);
+        $this->auditoria->registrar($idActa, 'aprobar_marcar_ausente', 'Firmante: ' . ($asistente['nombre'] ?? '') . '.');
+        $this->verificarActaCompleta($idActa);
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Solicitud aprobada. El firmante quedó marcado como ausente.');
+    }
+
+    public function rechazarSolicitudAusente(int $idActa, int $idSolicitud)
+    {
+        $context = $this->solicitudAusenteContext($idActa, $idSolicitud);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $this->solicitudesAusente->update($idSolicitud, [
+            'estado'       => 'rechazada',
+            'resuelta_por' => session('id_usuario'),
+            'resuelta_at'  => date('Y-m-d H:i:s'),
+        ]);
+        $this->auditoria->registrar($idActa, 'rechazar_marcar_ausente', 'Solicitud #' . $idSolicitud . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Solicitud rechazada.');
+    }
+
+    public function aprobarSolicitudReapertura(int $idActa, int $idSolicitud)
+    {
+        $context = $this->solicitudReaperturaContext($idActa, $idSolicitud);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $this->actas->update($idActa, [
+            'estado'              => 'en_edicion',
+            'codigo_verificacion' => null,
+        ]);
+        $this->solicitudesReapertura->update($idSolicitud, [
+            'estado'       => 'aprobada',
+            'resuelta_por' => session('id_usuario'),
+            'resuelta_at'  => date('Y-m-d H:i:s'),
+        ]);
+        $this->auditoria->registrar($idActa, 'aprobar_reapertura', 'Solicitud #' . $idSolicitud . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/editar')->with('success', 'Solicitud aprobada. El acta quedó en edición.');
+    }
+
+    public function rechazarSolicitudReapertura(int $idActa, int $idSolicitud)
+    {
+        $context = $this->solicitudReaperturaContext($idActa, $idSolicitud);
+        if ($context['error'] !== null) {
+            return redirect()->to($context['redirect'])->with('error', $context['error']);
+        }
+
+        $this->solicitudesReapertura->update($idSolicitud, [
+            'estado'       => 'rechazada',
+            'resuelta_por' => session('id_usuario'),
+            'resuelta_at'  => date('Y-m-d H:i:s'),
+        ]);
+        $this->auditoria->registrar($idActa, 'rechazar_reapertura', 'Solicitud #' . $idSolicitud . '.');
+
+        return redirect()->to('/actas/' . $idActa . '/firmas')->with('success', 'Solicitud de reapertura rechazada.');
+    }
+
     private function actaContext(int $idActa): ?array
     {
         $this->scope->syncActiveSession();
@@ -267,6 +405,56 @@ class ActaFirmas extends BaseController
         return ['error' => null, 'redirect' => $redirect, 'acta' => $acta, 'asistente' => $asistente];
     }
 
+    private function solicitudAusenteContext(int $idActa, int $idSolicitud): array
+    {
+        $redirect = '/actas/' . $idActa . '/firmas';
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return ['error' => 'Acta no encontrada para el cliente activo.', 'redirect' => '/actas', 'solicitud' => null];
+        }
+
+        $solicitud = $this->solicitudesAusente
+            ->where('id_solicitud', $idSolicitud)
+            ->where('id_acta', $idActa)
+            ->where('id_cliente', $acta['id_cliente'])
+            ->first();
+
+        if ($solicitud === null) {
+            return ['error' => 'Solicitud no encontrada.', 'redirect' => $redirect, 'solicitud' => null];
+        }
+
+        if ($solicitud['estado'] !== 'pendiente') {
+            return ['error' => 'La solicitud ya fue resuelta.', 'redirect' => $redirect, 'solicitud' => $solicitud];
+        }
+
+        return ['error' => null, 'redirect' => $redirect, 'solicitud' => $solicitud];
+    }
+
+    private function solicitudReaperturaContext(int $idActa, int $idSolicitud): array
+    {
+        $redirect = '/actas/' . $idActa . '/firmas';
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return ['error' => 'Acta no encontrada para el cliente activo.', 'redirect' => '/actas', 'solicitud' => null];
+        }
+
+        $solicitud = $this->solicitudesReapertura
+            ->where('id_solicitud', $idSolicitud)
+            ->where('id_acta', $idActa)
+            ->where('id_cliente', $acta['id_cliente'])
+            ->first();
+
+        if ($solicitud === null) {
+            return ['error' => 'Solicitud no encontrada.', 'redirect' => $redirect, 'solicitud' => null];
+        }
+
+        if ($solicitud['estado'] !== 'pendiente') {
+            return ['error' => 'La solicitud ya fue resuelta.', 'redirect' => $redirect, 'solicitud' => $solicitud];
+        }
+
+        return ['error' => null, 'redirect' => $redirect, 'solicitud' => $solicitud];
+    }
+
     private function puedeRecibirEmail(array $asistente, array $tokens): bool
     {
         $idAsistente = (int) $asistente['id_asistente'];
@@ -295,5 +483,34 @@ class ActaFirmas extends BaseController
 
         $subject = 'Firma pendiente - Acta ' . ($acta['numero'] ?? $acta['id_acta']);
         (new EmailService())->sendHtml((string) $asistente['email'], (string) $asistente['nombre'], $subject, $html);
+    }
+
+    private function verificarActaCompleta(int $idActa): void
+    {
+        $firmantes = $this->asistentes
+            ->where('id_acta', $idActa)
+            ->where('requiere_firma', 1)
+            ->where('asistencia', 'asiste')
+            ->findAll();
+
+        if ($firmantes === []) {
+            return;
+        }
+
+        foreach ($firmantes as $f) {
+            if ($f['firma_estado'] !== 'firmada') {
+                return;
+            }
+        }
+
+        $acta = $this->actas->find($idActa);
+        if ($acta !== null && $acta['estado'] !== 'firmada') {
+            $codigo = strtoupper(substr(hash('sha256', $idActa . '|' . $acta['numero'] . '|' . date('YmdHis')), 0, 12));
+            $this->actas->update($idActa, [
+                'estado'              => 'firmada',
+                'codigo_verificacion' => $codigo,
+            ]);
+            $this->auditoria->registrar($idActa, 'acta_firmada', 'Todas las firmas completadas. Código: ' . $codigo . '.');
+        }
     }
 }

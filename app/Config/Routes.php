@@ -64,6 +64,11 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->post('(:num)/firmas/email/(:num)', 'ActaFirmas::enviarEmailIndividual/$1/$2');
     $routes->post('(:num)/firmas/enlace/(:num)/regenerar', 'ActaFirmas::regenerarEnlace/$1/$2');
     $routes->post('(:num)/firmas/enlace/(:num)/cancelar', 'ActaFirmas::cancelarEnlace/$1/$2');
+    $routes->post('(:num)/firmas/solicitudes-reapertura', 'ActaFirmas::crearSolicitudReapertura/$1');
+    $routes->post('(:num)/firmas/solicitudes-ausente/(:num)/aprobar', 'ActaFirmas::aprobarSolicitudAusente/$1/$2');
+    $routes->post('(:num)/firmas/solicitudes-ausente/(:num)/rechazar', 'ActaFirmas::rechazarSolicitudAusente/$1/$2');
+    $routes->post('(:num)/firmas/solicitudes-reapertura/(:num)/aprobar', 'ActaFirmas::aprobarSolicitudReapertura/$1/$2');
+    $routes->post('(:num)/firmas/solicitudes-reapertura/(:num)/rechazar', 'ActaFirmas::rechazarSolicitudReapertura/$1/$2');
     $routes->get('(:num)/editar', 'Actas::edit/$1');
     $routes->post('(:num)', 'Actas::update/$1');
 });
@@ -71,4 +76,6 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
 // Firma pública por token (SIN autenticación).
 $routes->get('firmar/(:segment)', 'ActaFirmaPublica::firmar/$1');
 $routes->post('firmar/(:segment)', 'ActaFirmaPublica::procesarFirma/$1');
+$routes->post('firmar/(:segment)/ausente', 'ActaFirmaPublica::solicitarAusente/$1');
 $routes->get('firma-exitosa', 'ActaFirmaPublica::exitosa');
+$routes->get('firma-solicitud-recibida', 'ActaFirmaPublica::solicitudRecibida');

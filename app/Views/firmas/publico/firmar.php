@@ -27,6 +27,9 @@
                 <?php if (session('error')): ?>
                     <div class="alert alert-danger py-2"><?= esc(session('error')) ?></div>
                 <?php endif; ?>
+                <?php if (session('success')): ?>
+                    <div class="alert alert-success py-2"><?= esc(session('success')) ?></div>
+                <?php endif; ?>
 
                 <label class="form-label">Dibuja tu firma en el recuadro:</label>
                 <canvas id="firmaCanvas" class="firma-canvas"></canvas>
@@ -40,6 +43,21 @@
                     <input type="hidden" name="firma_imagen" id="firmaImagen">
                     <button type="submit" class="btn btn-primary w-100">Confirmar firma</button>
                 </form>
+
+                <hr class="my-4">
+
+                <?php if (! empty($solicitudAusente)): ?>
+                    <div class="alert alert-warning mb-0">
+                        Tu solicitud para marcarte como ausente está pendiente de revisión.
+                    </div>
+                <?php else: ?>
+                    <form action="<?= base_url('firmar/' . esc($token, 'url') . '/ausente') ?>" method="post">
+                        <?= csrf_field() ?>
+                        <label for="motivoAusente" class="form-label">No puedo firmar esta acta</label>
+                        <textarea class="form-control" id="motivoAusente" name="motivo" rows="3" maxlength="1000" placeholder="Indica el motivo para solicitar que te marquen como ausente" required></textarea>
+                        <button type="submit" class="btn btn-outline-secondary w-100 mt-2" onclick="return confirm('Se enviará la solicitud al administrador para revisión. ¿Continuar?');">Solicitar marcar ausente</button>
+                    </form>
+                <?php endif; ?>
             </div>
         </div>
         <p class="text-center text-muted small mt-3">Al firmar, se registra tu firma con fecha e IP como evidencia.</p>
