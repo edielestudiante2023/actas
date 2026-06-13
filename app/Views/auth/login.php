@@ -56,6 +56,8 @@
         </form>
 
         <div class="text-center mt-3">
+            <a href="<?= base_url('password/forgot') ?>" class="small text-decoration-none">Olvidé mi contraseña</a>
+            <span class="text-muted small mx-2">·</span>
             <a href="<?= base_url('verificar') ?>" class="small text-decoration-none">Verificar acta firmada</a>
         </div>
 

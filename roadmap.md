@@ -18,7 +18,7 @@
 
 **Antes de tocar la BD:** siempre migración/seeder + `php spark migrate` en LOCAL, verificar, y solo entonces en PRODUCCIÓN. Nunca SQL manual.
 
-**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: verificación pública de actas firmadas por `codigo_verificacion`. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
+**Estado actual de rama:** el trabajo activo va en `cycloid`. Último hito implementado: recuperación de contraseña por email con tokens seguros y `EmailService`. `main`/producción deben actualizarse mediante el flujo de despliegue cuando se confirme cada hito.
 
 **Flujo de despliegue (ya probado):**
 1. Local en `cycloid`: programar → `git add . && git status && git commit -m "fix: ..."`
@@ -41,8 +41,8 @@
 **Próximo trabajo sugerido (orden):**
 1. Commit del estado actual en `cycloid` antes de seguir acumulando cambios.
 2. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
-3. Recuperación de contraseña por email (usa `EmailService` SendGrid v7).
-4. Reenviar/cancelar enlaces de firma.
+3. Reenviar/cancelar enlaces de firma.
+4. Solicitudes de reapertura y marcar ausente.
 5. Layout base + menú por rol.
 
 **Hitos inmediatos (siguiente ejecución):**
@@ -86,7 +86,7 @@
 - [x] Selección de cliente activo (multi-tenant) y guard de alcance por cliente
 - [x] Logout
 - [x] **PWA instalable desde el login** (`manifest_login.json` + `sw_login.js`, íconos PNG 192/512)
-- [ ] Recuperación de contraseña por email (cambia la clave temporal `actas123`)
+- [x] Recuperación de contraseña por email (usa `EmailService`; pendiente configurar API key/remitente para envío real)
 - [x] Dashboard inicial por rol (básico)
 
 ## Fase 2 — Administración (CRUD maestros)
