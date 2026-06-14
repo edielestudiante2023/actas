@@ -79,6 +79,7 @@
                                     <?php endif; ?>
                                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/firmas') ?>" class="btn btn-sm btn-outline-success">Firmas</a>
                                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-dark" target="_blank" rel="noopener">PDF</a>
+                                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/word') ?>" class="btn btn-sm btn-outline-dark">Word</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

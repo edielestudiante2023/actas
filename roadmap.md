@@ -39,11 +39,11 @@
 - Vistas con Bootstrap 5 por CDN (aún sin layout base; conviene crear `app/Views/layouts/base.php` y migrar login/dashboard a `extend/section`).
 
 **Próximo trabajo sugerido (orden):**
-1. Exportar acta a Word (.doc).
-2. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
-3. Layout base + menú por rol.
-4. Manifest + service worker de la app principal (post-login).
-5. Cola de notificaciones y comando cron.
+1. Configurar `email.fromEmail`, `email.fromName` y `email.SMTPPass` en `.env` local/producción para validar envío real.
+2. Layout base + menú por rol.
+3. Manifest + service worker de la app principal (post-login).
+4. Cola de notificaciones y comando cron.
+5. Checklist de estados del acta (`anulada`, reapertura y cierres).
 
 **Hitos inmediatos (siguiente ejecución):**
 - [x] **Hito A — Usuarios por cliente:** modelos `RolModel`/`UsuarioRolModel`, listado de usuarios, crear/editar, asignar roles por cliente, bloquear/inactivar usuario.
@@ -120,7 +120,7 @@
 
 ## Fase 5 — Exportación y notificaciones
 - [x] Exportar acta a **PDF** (Dompdf) — incluye logo, datos, asistentes/quórum, votaciones, compromisos y firmas
-- [ ] Exportar acta a **Word** (.doc)
+- [x] Exportar acta a **Word** (.doc)
 - [ ] Migración `tbl_actas_notificaciones` (cola de emails)
 - [ ] Comando cron `actas:notificaciones` (recordatorios de firma y tareas)
 - [ ] Configurar cron en el servidor

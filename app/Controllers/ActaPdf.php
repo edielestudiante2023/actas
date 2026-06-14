@@ -32,29 +32,12 @@ class ActaPdf extends BaseController
 
     public function pdf(int $idActa)
     {
-        $this->scope->syncActiveSession();
-        $idCliente = $this->scope->activeId();
-        if ($idCliente === null) {
-            return redirect()->to('/dashboard')->with('error', 'Selecciona un cliente para continuar.');
-        }
-
-        $acta = $this->actas->findForCliente($idActa, $idCliente);
-        if ($acta === null) {
+        $data = $this->viewData($idActa);
+        if ($data === null) {
             return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
         }
 
-        $cliente = $this->scope->active();
-
-        $html = view('actas/pdf', [
-            'cliente'     => $cliente,
-            'acta'        => $acta,
-            'asistentes'  => $this->asistentes->asistentesActa($idActa),
-            'quorum'      => $this->asistentes->resumenQuorum($idActa),
-            'compromisos' => $this->compromisos->compromisosActa($idActa),
-            'votaciones'  => $this->votaciones->votacionesActa($idActa),
-            'anexos'      => $this->anexos->anexosActa($idActa),
-            'logo'        => $this->logoDataUri($cliente),
-        ]);
+        $html = view('actas/pdf', $data);
 
         $options = new Options();
         $options->set('isRemoteEnabled', false);
@@ -65,12 +48,63 @@ class ActaPdf extends BaseController
         $dompdf->setPaper('letter', 'portrait');
         $dompdf->render();
 
-        $nombre = 'acta-' . preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) ($acta['numero'] ?? $idActa)) . '.pdf';
+        $nombre = $this->fileName($data['acta'], $idActa, 'pdf');
 
         return $this->response
             ->setHeader('Content-Type', 'application/pdf')
             ->setHeader('Content-Disposition', 'inline; filename="' . $nombre . '"')
             ->setBody($dompdf->output());
+    }
+
+    public function word(int $idActa)
+    {
+        $data = $this->viewData($idActa);
+        if ($data === null) {
+            return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
+        }
+
+        $html = "\xEF\xBB\xBF" . view('actas/pdf', $data);
+        $nombre = $this->fileName($data['acta'], $idActa, 'doc');
+
+        return $this->response
+            ->setHeader('Content-Type', 'application/msword; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $nombre . '"')
+            ->setHeader('Cache-Control', 'private, max-age=0, must-revalidate')
+            ->setBody($html);
+    }
+
+    private function viewData(int $idActa): ?array
+    {
+        $this->scope->syncActiveSession();
+        $idCliente = $this->scope->activeId();
+        if ($idCliente === null) {
+            return null;
+        }
+
+        $acta = $this->actas->findForCliente($idActa, $idCliente);
+        if ($acta === null) {
+            return null;
+        }
+
+        $cliente = $this->scope->active();
+
+        return [
+            'cliente'     => $cliente,
+            'acta'        => $acta,
+            'asistentes'  => $this->asistentes->asistentesActa($idActa),
+            'quorum'      => $this->asistentes->resumenQuorum($idActa),
+            'compromisos' => $this->compromisos->compromisosActa($idActa),
+            'votaciones'  => $this->votaciones->votacionesActa($idActa),
+            'anexos'      => $this->anexos->anexosActa($idActa),
+            'logo'        => $this->logoDataUri($cliente),
+        ];
+    }
+
+    private function fileName(array $acta, int $idActa, string $extension): string
+    {
+        $numero = preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) ($acta['numero'] ?? $idActa));
+
+        return 'acta-' . $numero . '.' . $extension;
     }
 
     private function logoDataUri(?array $cliente): ?string

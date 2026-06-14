@@ -100,6 +100,7 @@
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/anexos') ?>" class="btn btn-outline-secondary">Anexos</a>
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/firmas') ?>" class="btn btn-outline-success">Firmas</a>
                     <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-outline-dark" target="_blank" rel="noopener">PDF</a>
+                    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/word') ?>" class="btn btn-outline-dark">Word</a>
                 <?php endif; ?>
                 <button type="submit" class="btn btn-primary">Guardar borrador</button>
             </div>

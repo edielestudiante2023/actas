@@ -13,6 +13,7 @@
         <div class="d-flex gap-2">
             <a href="<?= base_url('actas/' . $acta['id_acta'] . '/anexos') ?>" class="btn btn-sm btn-outline-light">Anexos</a>
             <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-light" target="_blank" rel="noopener">PDF</a>
+            <a href="<?= base_url('actas/' . $acta['id_acta'] . '/word') ?>" class="btn btn-sm btn-outline-light">Word</a>
             <a href="<?= base_url('actas') ?>" class="btn btn-sm btn-outline-light">Actas</a>
             <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
         </div>
