@@ -9,7 +9,7 @@ $fmtFecha = static function (?string $v): string {
 };
 $estadoTxt = ucfirst(str_replace('_', ' ', (string) $acta['estado']));
 $firmaValida = static function (?string $firma): bool {
-    return is_string($firma) && preg_match('/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/', $firma) === 1;
+    return is_string($firma) && preg_match('/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/', $firma) === 1;
 };
 $fmtFechaHora = static function (?string $v): string {
     if (empty($v)) {

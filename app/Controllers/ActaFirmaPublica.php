@@ -65,8 +65,8 @@ class ActaFirmaPublica extends BaseController
         }
 
         $firma = (string) $this->request->getPost('firma_imagen');
-        if (! preg_match('/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/', $firma)) {
-            return redirect()->to('/firmar/' . $token)->with('error', 'La firma es obligatoria. Dibuja tu firma antes de enviar.');
+        if (! $this->firmaValida($firma)) {
+            return redirect()->to('/firmar/' . $token)->with('error', 'La firma es obligatoria. Dibuja tu firma o sube una imagen válida.');
         }
 
         $now = date('Y-m-d H:i:s');
@@ -178,5 +178,24 @@ class ActaFirmaPublica extends BaseController
             ]);
             $this->auditoria->registrar($idActa, 'acta_firmada', 'Todas las firmas completadas. Código: ' . $codigo . '.');
         }
+    }
+
+    private function firmaValida(string $firma): bool
+    {
+        if (! preg_match('/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+\/=]+)$/', $firma, $matches)) {
+            return false;
+        }
+
+        $raw = base64_decode($matches[2], true);
+        if ($raw === false || strlen($raw) > 2 * 1024 * 1024) {
+            return false;
+        }
+
+        $info = @getimagesizefromstring($raw);
+        if ($info === false) {
+            return false;
+        }
+
+        return in_array($info['mime'] ?? '', ['image/png', 'image/jpeg', 'image/webp'], true);
     }
 }

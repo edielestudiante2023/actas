@@ -9,6 +9,7 @@
     <style>
         body { background: #f1f3f5; }
         .firma-canvas { border: 2px dashed #adb5bd; border-radius: 12px; width: 100%; height: 220px; touch-action: none; background: #fff; }
+        .firma-preview { max-width: 100%; max-height: 160px; object-fit: contain; border: 1px solid #dee2e6; border-radius: 10px; background: #fff; padding: 8px; display: none; }
     </style>
 </head>
 <body>
@@ -31,11 +32,30 @@
                     <div class="alert alert-success py-2"><?= esc(session('success')) ?></div>
                 <?php endif; ?>
 
-                <label class="form-label">Dibuja tu firma en el recuadro:</label>
-                <canvas id="firmaCanvas" class="firma-canvas"></canvas>
-                <div class="d-flex justify-content-between mt-2">
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiar">Limpiar</button>
-                    <small class="text-muted">Usa el dedo (móvil) o el mouse.</small>
+                <label class="form-label">Elige cómo registrar tu firma:</label>
+                <ul class="nav nav-pills nav-fill mb-3" id="firmaTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="dibujar-tab" data-bs-toggle="pill" data-bs-target="#dibujarPanel" type="button" role="tab">Firmar con dedo</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="imagen-tab" data-bs-toggle="pill" data-bs-target="#imagenPanel" type="button" role="tab">Subir imagen</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="dibujarPanel" role="tabpanel" aria-labelledby="dibujar-tab">
+                        <canvas id="firmaCanvas" class="firma-canvas"></canvas>
+                        <div class="d-flex justify-content-between mt-2">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiar">Limpiar</button>
+                            <small class="text-muted">Usa el dedo (móvil) o el mouse.</small>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="imagenPanel" role="tabpanel" aria-labelledby="imagen-tab">
+                        <input type="file" class="form-control" id="firmaArchivo" accept="image/png,image/jpeg,image/webp">
+                        <div class="small text-muted mt-2">Formatos permitidos: PNG, JPG/JPEG o WebP. Máximo 2 MB.</div>
+                        <img id="firmaPreview" class="firma-preview mt-3" alt="Vista previa de la firma">
+                    </div>
                 </div>
 
                 <form action="<?= base_url('firmar/' . esc($token, 'url')) ?>" method="post" id="formFirma" class="mt-3">
@@ -67,7 +87,9 @@
     (function () {
         var canvas = document.getElementById('firmaCanvas');
         var ctx = canvas.getContext('2d');
-        var drawing = false, hasDrawn = false;
+        var drawing = false, hasDrawn = false, uploadedSignature = '';
+        var fileInput = document.getElementById('firmaArchivo');
+        var preview = document.getElementById('firmaPreview');
 
         function resize() {
             var ratio = window.devicePixelRatio || 1;
@@ -100,13 +122,71 @@
         document.getElementById('btnLimpiar').addEventListener('click', function () {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             hasDrawn = false;
+            uploadedSignature = '';
+            if (fileInput) fileInput.value = '';
+            if (preview) { preview.removeAttribute('src'); preview.style.display = 'none'; }
         });
 
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                uploadedSignature = '';
+                if (preview) { preview.removeAttribute('src'); preview.style.display = 'none'; }
+
+                var file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+                if (!file) return;
+
+                if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+                    alert('Sube una imagen PNG, JPG/JPEG o WebP.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('La imagen no debe superar 2 MB.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var maxW = 900, maxH = 300;
+                        var scale = Math.min(maxW / img.width, maxH / img.height, 1);
+                        var w = Math.max(1, Math.round(img.width * scale));
+                        var h = Math.max(1, Math.round(img.height * scale));
+                        var out = document.createElement('canvas');
+                        out.width = w;
+                        out.height = h;
+                        var outCtx = out.getContext('2d');
+                        outCtx.drawImage(img, 0, 0, w, h);
+                        uploadedSignature = out.toDataURL('image/png');
+                        if (preview) {
+                            preview.src = uploadedSignature;
+                            preview.style.display = 'block';
+                        }
+                    };
+                    img.onerror = function () {
+                        alert('No fue posible leer la imagen de firma.');
+                        fileInput.value = '';
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         document.getElementById('formFirma').addEventListener('submit', function (e) {
-            if (!hasDrawn) { e.preventDefault(); alert('Dibuja tu firma antes de confirmar.'); return; }
+            if (uploadedSignature !== '') {
+                document.getElementById('firmaImagen').value = uploadedSignature;
+                return;
+            }
+
+            if (!hasDrawn) { e.preventDefault(); alert('Dibuja tu firma o sube una imagen antes de confirmar.'); return; }
             document.getElementById('firmaImagen').value = canvas.toDataURL('image/png');
         });
     })();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
