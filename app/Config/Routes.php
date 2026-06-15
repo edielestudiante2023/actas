@@ -17,6 +17,9 @@ $routes->get('verificar/(:segment)', 'ActaVerificacion::resultado/$1');
 
 $routes->get('dashboard', 'Dashboard::index', ['filter' => 'auth']);
 
+$routes->get('compromisos', 'Compromisos::index', ['filter' => ['auth', 'cliente']]);
+$routes->post('compromisos/(:num)', 'Compromisos::update/$1', ['filter' => ['auth', 'cliente']]);
+
 $routes->group('clientes', ['filter' => 'auth'], static function ($routes) {
     $routes->get('/', 'Clientes::index');
     $routes->get('nuevo', 'Clientes::createForm');

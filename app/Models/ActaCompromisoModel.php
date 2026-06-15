@@ -52,4 +52,27 @@ class ActaCompromisoModel extends Model
             ->where('id_acta', $idActa)
             ->first();
     }
+
+    /**
+     * Todos los compromisos de un cliente (de todas sus actas).
+     */
+    public function compromisosCliente(int $idCliente): array
+    {
+        return $this->select('tbl_acta_compromisos.*, a.numero AS acta_numero, a.estado AS acta_estado, u.nombre_completo AS usuario_nombre, u.email AS usuario_email')
+            ->join('tbl_actas a', 'a.id_acta = tbl_acta_compromisos.id_acta')
+            ->join('tbl_usuarios u', 'u.id_usuario = tbl_acta_compromisos.id_responsable', 'left')
+            ->where('a.id_cliente', $idCliente)
+            ->orderBy("FIELD(tbl_acta_compromisos.estado, 'vencido','pendiente','en_progreso','cumplido','cancelado')", '', false)
+            ->orderBy('tbl_acta_compromisos.fecha_vencimiento', 'ASC')
+            ->findAll();
+    }
+
+    public function findForCliente(int $idCompromiso, int $idCliente): ?array
+    {
+        return $this->select('tbl_acta_compromisos.*')
+            ->join('tbl_actas a', 'a.id_acta = tbl_acta_compromisos.id_acta')
+            ->where('tbl_acta_compromisos.id_compromiso', $idCompromiso)
+            ->where('a.id_cliente', $idCliente)
+            ->first();
+    }
 }

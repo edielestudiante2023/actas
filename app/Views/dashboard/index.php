@@ -32,8 +32,9 @@
         <?php endif; ?>
 
         <?php if ($cliente_activo !== null): ?>
-            <div class="mb-3">
+            <div class="mb-3 d-flex flex-wrap gap-2">
                 <a href="<?= base_url('actas') ?>" class="btn btn-success">Gestionar actas</a>
+                <a href="<?= base_url('compromisos') ?>" class="btn btn-outline-warning">Compromisos</a>
             </div>
         <?php endif; ?>
 
