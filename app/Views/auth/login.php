@@ -41,9 +41,9 @@
         .brand-badge {
             position: absolute; top: -42px; left: 50%; transform: translateX(-50%);
             width: 84px; height: 84px; border-radius: 24px;
-            background: linear-gradient(150deg, var(--navy) 0%, var(--navy-deep) 100%);
+            background: #fff;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 12px 28px rgba(13,21,40,.45); border: 1px solid rgba(201,162,75,.35);
+            box-shadow: 0 12px 28px rgba(13,21,40,.22); border: 1px solid rgba(201,162,75,.45);
         }
         .brand-badge img { width: 58px; height: 58px; }
         .auth-title { font-weight: 800; letter-spacing: .5px; color: var(--navy); margin: 0; }
@@ -78,7 +78,7 @@
 <body>
     <div class="auth-card">
         <div class="brand-badge">
-            <img src="<?= base_url('assets/icons/entrega-04.png') ?>" alt="Actas">
+            <img src="<?= base_url('assets/icons/entrega-05.png') ?>" alt="Actas">
         </div>
 
         <div class="text-center mb-4">
