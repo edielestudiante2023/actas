@@ -55,7 +55,7 @@
                 <?php endif; ?>
 
                 <?php $clientesDisponibles = $clientes_disponibles ?? []; ?>
-                <?php if ($clientesDisponibles !== []): ?>
+                <?php if (session('es_superadmin') || count($clientesDisponibles) > 1): ?>
                     <form action="<?= base_url('clientes/activo') ?>" method="post" class="row g-2 align-items-end">
                         <?= csrf_field() ?>
                         <div class="col-12 col-md-8">
