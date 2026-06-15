@@ -6,9 +6,11 @@
     <title>Ingresar · Actas</title>
 
     <!-- Favicon (emblema dorado) -->
-    <link rel="icon" href="<?= base_url('favicon.ico') ?>" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/icons/favicon-32.png') ?>">
-    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('assets/icons/favicon-16.png') ?>">
+    <link rel="icon" href="<?= base_url('favicon.ico') ?>?v=20260615b" sizes="any">
+    <link rel="shortcut icon" href="<?= base_url('favicon.ico') ?>?v=20260615b" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="48x48" href="<?= base_url('assets/icons/favicon-48.png') ?>?v=20260615b">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/icons/favicon-32.png') ?>?v=20260615b">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?= base_url('assets/icons/favicon-16.png') ?>?v=20260615b">
 
     <!-- PWA -->
     <meta name="theme-color" content="#16203a">
