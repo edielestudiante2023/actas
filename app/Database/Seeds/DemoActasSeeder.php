@@ -398,17 +398,18 @@ class DemoActasSeeder extends Seeder
 
     private function insertCompromisos(int $idActa): void
     {
+        // [descripcion, nombre, vencimiento, estado, avance, userKey]
         $items = [
-            ['Revisar cotizaciones de impermeabilizacion de cubierta.', 'Edison Cuervo Demo', '+7 days', 'en_progreso', 45],
-            ['Actualizar matriz de cartera y enviar informe al consejo.', 'Administracion Demo', '+3 days', 'pendiente', 10],
-            ['Coordinar jornada de mantenimiento de luminarias.', 'Natalia Pardo Demo', '+12 days', 'pendiente', 0],
+            ['Revisar cotizaciones de impermeabilizacion de cubierta.', 'Edison Cuervo Demo', '+7 days', 'en_progreso', 45, 'edison'],
+            ['Actualizar matriz de cartera y enviar informe al consejo.', 'Administracion Demo', '+3 days', 'pendiente', 10, 'admin'],
+            ['Coordinar jornada de mantenimiento de luminarias.', 'Natalia Pardo Demo', '+12 days', 'pendiente', 0, 'natalia'],
         ];
 
         foreach ($items as $item) {
             $this->db->table('tbl_acta_compromisos')->insert([
                 'id_acta' => $idActa,
                 'descripcion' => $item[0],
-                'id_responsable' => null,
+                'id_responsable' => $this->usuarios[$item[5]] ?? null,
                 'responsable_nombre' => $item[1],
                 'fecha_vencimiento' => date('Y-m-d', strtotime($item[2])),
                 'estado' => $item[3],

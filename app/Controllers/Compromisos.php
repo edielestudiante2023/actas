@@ -28,7 +28,18 @@ class Compromisos extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Selecciona un cliente para continuar.');
         }
 
-        $lista = $this->compromisos->compromisosCliente($idCliente);
+        $todos     = $this->compromisos->compromisosCliente($idCliente);
+        $idUsuario = (int) session('id_usuario');
+
+        // "Mios" = compromisos cuyo responsable soy yo.
+        $mios = array_values(array_filter($todos, static fn ($c) => (int) ($c['id_responsable'] ?? 0) === $idUsuario));
+
+        // Default del filtro segun rol: admin/superadmin ven "todos"; el resto, "mios".
+        $esAdmin = (bool) session('es_superadmin') || in_array('administrador', (array) session('roles'), true);
+        $param   = $this->request->getGet('mios');
+        $verMios = $param === null ? ! $esAdmin : ($param === '1');
+
+        $lista = $verMios ? $mios : $todos;
 
         $resumen = ['total' => count($lista), 'pendiente' => 0, 'en_progreso' => 0, 'cumplido' => 0, 'vencido' => 0, 'cancelado' => 0];
         foreach ($lista as $c) {
@@ -43,6 +54,9 @@ class Compromisos extends BaseController
             'compromisos' => $lista,
             'estados'     => self::ESTADOS,
             'resumen'     => $resumen,
+            'verMios'     => $verMios,
+            'countTodos'  => count($todos),
+            'countMios'   => count($mios),
         ]);
     }
 

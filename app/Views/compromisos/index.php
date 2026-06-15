@@ -33,6 +33,11 @@
             <div class="alert alert-danger py-2"><ul class="mb-0"><?php foreach (session('errors') as $e): ?><li><?= esc($e) ?></li><?php endforeach; ?></ul></div>
         <?php endif; ?>
 
+        <div class="btn-group mb-3" role="group" aria-label="Filtro de compromisos">
+            <a href="<?= base_url('compromisos?mios=0') ?>" class="btn btn-sm <?= $verMios ? 'btn-outline-primary' : 'btn-primary' ?>">Todos (<?= (int) $countTodos ?>)</a>
+            <a href="<?= base_url('compromisos?mios=1') ?>" class="btn btn-sm <?= $verMios ? 'btn-primary' : 'btn-outline-primary' ?>">Míos (<?= (int) $countMios ?>)</a>
+        </div>
+
         <div class="d-flex flex-wrap gap-2 mb-3">
             <span class="badge bg-secondary">Total: <?= (int) $resumen['total'] ?></span>
             <span class="badge bg-warning text-dark">Pendientes: <?= (int) $resumen['pendiente'] ?></span>
