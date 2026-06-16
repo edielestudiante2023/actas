@@ -98,5 +98,6 @@
 
         <p class="text-muted mt-4 small">Siguiente: anexos del acta e integrar logo del cliente en encabezados y export PDF. Ver <code>roadmap.md</code>.</p>
     </div>
+    <?= $this->include("partials/notif_bell") ?>
 </body>
 </html>

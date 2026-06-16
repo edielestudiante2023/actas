@@ -93,5 +93,6 @@
         </form>
     </main>
     <?= $this->include("partials/home_fab") ?>
+    <?= $this->include("partials/notif_bell") ?>
 </body>
 </html>
