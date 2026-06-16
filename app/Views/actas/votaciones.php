@@ -106,10 +106,16 @@
                     <?php endif; ?>
 
                     <?php if ($editable): ?>
-                        <form action="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones/' . $v['id_votacion'] . '/cerrar') ?>" method="post" class="mt-3" onsubmit="return confirm('¿Cerrar la votación y calcular el resultado?');">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="btn btn-dark btn-sm">Cerrar votación</button>
-                        </form>
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <form action="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones/' . $v['id_votacion'] . '/enviar-email') ?>" method="post" onsubmit="return confirm('¿Enviar el enlace de voto por email a los asistentes presentes que aún no votan?');">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Enviar enlaces por email</button>
+                            </form>
+                            <form action="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones/' . $v['id_votacion'] . '/cerrar') ?>" method="post" onsubmit="return confirm('¿Cerrar la votación y calcular el resultado?');">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="btn btn-dark btn-sm">Cerrar votación</button>
+                            </form>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>

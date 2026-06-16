@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Libraries\ClienteScope;
+use App\Libraries\EmailService;
 use App\Models\ActaAsistenteModel;
 use App\Models\ActaAuditoriaModel;
 use App\Models\ActaModel;
 use App\Models\ActaVotacionModel;
+use App\Models\ActaVotacionTokenModel;
 use App\Models\ActaVotacionVotoModel;
 
 class ActaVotaciones extends BaseController
@@ -18,8 +20,11 @@ class ActaVotaciones extends BaseController
     private ActaModel $actas;
     private ActaVotacionModel $votaciones;
     private ActaVotacionVotoModel $votos;
+    private ActaVotacionTokenModel $tokens;
     private ActaAsistenteModel $asistentes;
     private ActaAuditoriaModel $auditoria;
+
+    private const DIAS_EXPIRA_VOTO = 2;
 
     public function __construct()
     {
@@ -27,6 +32,7 @@ class ActaVotaciones extends BaseController
         $this->actas = new ActaModel();
         $this->votaciones = new ActaVotacionModel();
         $this->votos = new ActaVotacionVotoModel();
+        $this->tokens = new ActaVotacionTokenModel();
         $this->asistentes = new ActaAsistenteModel();
         $this->auditoria = new ActaAuditoriaModel();
     }
@@ -152,6 +158,74 @@ class ActaVotaciones extends BaseController
         $this->auditoria->registrar($idActa, 'cerrar_votacion', 'Votación #' . $idVotacion . ' cerrada (' . $c['favor'] . '-' . $c['contra'] . '-' . $c['abstencion'] . ').');
 
         return redirect()->to('/actas/' . $idActa . '/votaciones')->with('success', 'Votación cerrada.');
+    }
+
+    /** Envía el enlace personal de voto por email a los asistentes presentes que aún no votan. */
+    public function enviarVotoEmails(int $idActa, int $idVotacion)
+    {
+        $acta = $this->actaContext($idActa);
+        if ($acta === null) {
+            return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
+        }
+
+        $votacion = $this->votaciones->findForActa($idVotacion, $idActa);
+        if ($votacion === null || $votacion['estado'] !== 'abierta' || $votacion['modo'] !== 'digital') {
+            return redirect()->to('/actas/' . $idActa . '/votaciones')->with('error', 'La votación no está abierta.');
+        }
+
+        $cliente = $this->scope->active();
+        $now     = date('Y-m-d H:i:s');
+        $expira  = date('Y-m-d H:i:s', time() + self::DIAS_EXPIRA_VOTO * 86400);
+        $enviados = 0;
+        $errores  = 0;
+
+        foreach ($this->asistentes->asistentesActa($idActa) as $a) {
+            if (($a['asistencia'] ?? '') !== 'asiste') {
+                continue;
+            }
+            if (empty($a['email']) || ! filter_var($a['email'], FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+            if ($this->votos->miVoto($idVotacion, (int) $a['id_asistente']) !== null) {
+                continue; // ya votó (en-app o por email)
+            }
+
+            $tok = $this->tokens->tokenDeAsistente($idVotacion, (int) $a['id_asistente']);
+            if ($tok === null) {
+                $token = $this->tokens->nuevoToken();
+                $this->tokens->insert([
+                    'token'        => $token,
+                    'id_votacion'  => $idVotacion,
+                    'id_asistente' => (int) $a['id_asistente'],
+                    'id_cliente'   => $acta['id_cliente'],
+                    'expires_at'   => $expira,
+                    'created_at'   => $now,
+                ]);
+            } else {
+                $token = $tok['token'];
+            }
+
+            $html = view('emails/voto_enlace', [
+                'nombre'   => $a['nombre'] ?? '',
+                'cliente'  => $cliente,
+                'acta'     => $acta,
+                'votacion' => $votacion,
+                'votoUrl'  => base_url('votar/' . $token),
+            ]);
+
+            try {
+                (new EmailService())->sendHtml((string) $a['email'], (string) $a['nombre'], 'Votación pendiente - Acta ' . ($acta['numero'] ?? $acta['id_acta']), $html);
+                $enviados++;
+            } catch (\Throwable $e) {
+                $errores++;
+                log_message('error', 'Voto email falló: ' . $e->getMessage());
+            }
+        }
+
+        $msg = 'Enlaces de voto enviados: ' . $enviados . '.' . ($errores > 0 ? ' Con errores: ' . $errores . ' (revisa logs).' : '');
+        $this->auditoria->registrar($idActa, 'enviar_voto_emails', $msg);
+
+        return redirect()->to('/actas/' . $idActa . '/votaciones')->with($errores > 0 ? 'error' : 'success', $msg);
     }
 
     public function create(int $idActa)

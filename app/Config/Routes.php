@@ -58,6 +58,7 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->post('(:num)/votaciones/abrir', 'ActaVotaciones::abrir/$1');
     $routes->post('(:num)/votaciones/(:num)/votar', 'ActaVotaciones::votar/$1/$2');
     $routes->post('(:num)/votaciones/(:num)/cerrar', 'ActaVotaciones::cerrar/$1/$2');
+    $routes->post('(:num)/votaciones/(:num)/enviar-email', 'ActaVotaciones::enviarVotoEmails/$1/$2');
     $routes->post('(:num)/votaciones/(:num)', 'ActaVotaciones::update/$1/$2');
     $routes->get('(:num)/anexos', 'ActaAnexos::index/$1');
     $routes->post('(:num)/anexos', 'ActaAnexos::create/$1');
@@ -85,4 +86,9 @@ $routes->get('firmar/(:segment)', 'ActaFirmaPublica::firmar/$1');
 $routes->post('firmar/(:segment)', 'ActaFirmaPublica::procesarFirma/$1');
 $routes->post('firmar/(:segment)/ausente', 'ActaFirmaPublica::solicitarAusente/$1');
 $routes->get('firma-exitosa', 'ActaFirmaPublica::exitosa');
+
+// Voto público por token (SIN autenticación).
+$routes->get('votar/(:segment)', 'VotoPublico::votar/$1');
+$routes->post('votar/(:segment)', 'VotoPublico::procesarVoto/$1');
+$routes->get('voto-exitoso', 'VotoPublico::exitoso');
 $routes->get('firma-solicitud-recibida', 'ActaFirmaPublica::solicitudRecibida');
