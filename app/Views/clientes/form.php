@@ -92,5 +92,6 @@
             </div>
         </form>
     </main>
+    <?= $this->include("partials/home_fab") ?>
 </body>
 </html>

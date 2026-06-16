@@ -104,5 +104,6 @@ $fmtFecha = static function (?string $v): string {
             </div>
         <?php endif; ?>
     </main>
+    <?= $this->include("partials/home_fab") ?>
 </body>
 </html>

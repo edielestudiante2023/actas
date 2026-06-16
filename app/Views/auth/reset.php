@@ -39,5 +39,6 @@
             <button type="submit" class="btn btn-primary w-100">Actualizar contraseña</button>
         </form>
     </main>
+    <?= $this->include("partials/home_fab") ?>
 </body>
 </html>

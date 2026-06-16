@@ -141,5 +141,6 @@
             </div>
         </div>
     </main>
+    <?= $this->include("partials/home_fab") ?>
 </body>
 </html>

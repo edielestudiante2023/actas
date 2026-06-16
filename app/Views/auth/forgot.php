@@ -33,5 +33,6 @@
             <a href="<?= base_url('login') ?>" class="small text-decoration-none">Volver al ingreso</a>
         </div>
     </main>
+    <?= $this->include("partials/home_fab") ?>
 </body>
 </html>
