@@ -39,24 +39,35 @@ class Compromisos extends BaseController
         $param   = $this->request->getGet('mios');
         $verMios = $param === null ? ! $esAdmin : ($param === '1');
 
-        $lista = $verMios ? $mios : $todos;
+        $base = $verMios ? $mios : $todos;
 
-        $resumen = ['total' => count($lista), 'pendiente' => 0, 'en_progreso' => 0, 'cumplido' => 0, 'vencido' => 0, 'cancelado' => 0];
-        foreach ($lista as $c) {
+        // Conteos sobre el conjunto base (Todos/Míos), antes de filtrar por estado.
+        $resumen = ['total' => count($base), 'pendiente' => 0, 'en_progreso' => 0, 'cumplido' => 0, 'vencido' => 0, 'cancelado' => 0];
+        foreach ($base as $c) {
             $estado = (string) $c['estado'];
             if (isset($resumen[$estado])) {
                 $resumen[$estado]++;
             }
         }
 
+        // Filtro por estado (chips clickeables).
+        $estadoActivo = (string) ($this->request->getGet('estado') ?? '');
+        if ($estadoActivo !== '' && in_array($estadoActivo, self::ESTADOS, true)) {
+            $lista = array_values(array_filter($base, static fn ($c) => (string) $c['estado'] === $estadoActivo));
+        } else {
+            $estadoActivo = '';
+            $lista = $base;
+        }
+
         return view('compromisos/index', [
-            'cliente'     => $this->scope->active(),
-            'compromisos' => $lista,
-            'estados'     => self::ESTADOS,
-            'resumen'     => $resumen,
-            'verMios'     => $verMios,
-            'countTodos'  => count($todos),
-            'countMios'   => count($mios),
+            'cliente'      => $this->scope->active(),
+            'compromisos'  => $lista,
+            'estados'      => self::ESTADOS,
+            'resumen'      => $resumen,
+            'verMios'      => $verMios,
+            'countTodos'   => count($todos),
+            'countMios'    => count($mios),
+            'estadoActivo' => $estadoActivo,
         ]);
     }
 
