@@ -37,11 +37,17 @@ class ActaPdf extends BaseController
             return redirect()->to('/actas')->with('error', 'Acta no encontrada para el cliente activo.');
         }
 
+        // Dompdf puede requerir bastante memoria; ampliamos solo para esta operación.
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(120);
+
         $html = view('actas/pdf', $data);
 
         $options = new Options();
         $options->set('isRemoteEnabled', false);
         $options->set('defaultFont', 'DejaVu Sans');
+        $options->set('dpi', 96);
+        $options->set('isFontSubsettingEnabled', true);
 
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html, 'UTF-8');
@@ -132,8 +138,16 @@ class ActaPdf extends BaseController
             return null;
         }
 
-        $mime = function_exists('mime_content_type') ? (mime_content_type($path) ?: 'image/png') : 'image/png';
+        return 'data:' . $this->mimePorExtension($path) . ';base64,' . base64_encode($data);
+    }
 
-        return 'data:' . $mime . ';base64,' . base64_encode($data);
+    private function mimePorExtension(string $path): string
+    {
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp'        => 'image/webp',
+            'gif'         => 'image/gif',
+            default       => 'image/png',
+        };
     }
 }

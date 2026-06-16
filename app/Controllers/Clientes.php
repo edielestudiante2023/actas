@@ -176,8 +176,16 @@ class Clientes extends BaseController
             return $this->response->setStatusCode(404);
         }
 
+        $mime = match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp'        => 'image/webp',
+            'gif'         => 'image/gif',
+            'png'         => 'image/png',
+            default       => 'application/octet-stream',
+        };
+
         return $this->response
-            ->setHeader('Content-Type', mime_content_type($path) ?: 'application/octet-stream')
+            ->setHeader('Content-Type', $mime)
             ->setHeader('Cache-Control', 'private, max-age=86400')
             ->setBody(file_get_contents($path));
     }
