@@ -110,16 +110,17 @@ $fmtFechaHora = static function (?string $v): string {
     <h2>Asistentes</h2>
     <table class="data">
         <thead>
-            <tr><th>Nombre</th><th>Cargo</th><th>Tipo</th><th>Asistencia</th></tr>
+            <tr><th>Nombre</th><th>Cargo</th><th>Inmueble</th><th>Tipo</th><th>Asistencia</th></tr>
         </thead>
         <tbody>
             <?php if ($asistentes === []): ?>
-                <tr><td colspan="4" class="center muted">Sin asistentes registrados.</td></tr>
+                <tr><td colspan="5" class="center muted">Sin asistentes registrados.</td></tr>
             <?php endif; ?>
             <?php foreach ($asistentes as $a): ?>
                 <tr>
                     <td><?= esc($a['nombre']) ?></td>
                     <td><?= esc($a['cargo'] ?? '—') ?></td>
+                    <td><?= esc($a['inmueble'] ?? '—') ?></td>
                     <td><?= esc(str_replace('_', ' ', (string) $a['tipo'])) ?></td>
                     <td><?= esc(str_replace('_', ' ', (string) $a['asistencia'])) ?></td>
                 </tr>

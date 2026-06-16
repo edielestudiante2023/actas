@@ -52,6 +52,8 @@ class ClienteConsejo extends BaseController
         $rules = [
             'cargo' => 'required|in_list[presidente_consejo,consejero]',
             'id_usuario' => 'required|is_natural_no_zero',
+            'inmueble' => 'required|max_length[120]',
+            'coeficiente' => 'permit_empty|decimal',
             'fecha_inicio' => 'permit_empty|valid_date[Y-m-d]',
         ];
 
@@ -78,6 +80,8 @@ class ClienteConsejo extends BaseController
             'id_cliente' => $idCliente,
             'id_usuario' => $idUsuario,
             'cargo' => $cargo,
+            'inmueble' => trim((string) $this->request->getPost('inmueble')),
+            'coeficiente' => $this->nullablePost('coeficiente'),
             'estado' => 'activo',
             'fecha_inicio' => $this->nullablePost('fecha_inicio'),
             'fecha_fin' => null,

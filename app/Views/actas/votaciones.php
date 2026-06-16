@@ -91,7 +91,7 @@
 
                     <hr>
 
-                    <?php if ($miAsistente !== null && ($miAsistente['asistencia'] ?? '') === 'asiste'): ?>
+                    <?php if ($miAsistente !== null && ($miAsistente['asistencia'] ?? '') === 'asiste' && ($miAsistente['tipo'] ?? '') === 'miembro_consejo'): ?>
                         <div class="d-flex flex-wrap gap-2 align-items-center">
                             <span class="text-muted small me-2">Tu voto<?= $miVoto ? ' (actual: ' . esc($miVoto) . ')' : '' ?>:</span>
                             <form action="<?= base_url('actas/' . $acta['id_acta'] . '/votaciones/' . $v['id_votacion'] . '/votar') ?>" method="post" class="d-flex gap-2">
@@ -102,7 +102,7 @@
                             </form>
                         </div>
                     <?php else: ?>
-                        <div class="text-muted small">No estás registrado como asistente presente de esta acta, por lo que no puedes votar.</div>
+                        <div class="text-muted small">Solo los miembros del consejo presentes pueden votar (el administrador y asesores no votan).</div>
                     <?php endif; ?>
 
                     <?php if ($editable): ?>

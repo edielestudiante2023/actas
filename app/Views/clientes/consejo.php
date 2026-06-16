@@ -76,7 +76,15 @@
                         </select>
                         <div class="form-text">Primero asigna el rol al usuario en Administración de usuarios.</div>
                     </div>
-                    <div class="col-12 col-lg-2">
+                    <div class="col-12 col-lg-4">
+                        <label class="form-label">Inmueble que representa</label>
+                        <input type="text" name="inmueble" class="form-control" value="<?= esc(old('inmueble')) ?>" maxlength="120" placeholder="Ej. Torre A - Apto 502" required>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <label class="form-label">Coeficiente (%)</label>
+                        <input type="text" name="coeficiente" class="form-control" value="<?= esc(old('coeficiente')) ?>" placeholder="Opcional">
+                    </div>
+                    <div class="col-6 col-lg-2">
                         <label class="form-label">Inicio</label>
                         <input type="date" name="fecha_inicio" class="form-control" value="<?= esc(old('fecha_inicio', date('Y-m-d'))) ?>">
                     </div>
@@ -95,6 +103,7 @@
                         <tr>
                             <th>Usuario</th>
                             <th>Cargo</th>
+                            <th>Inmueble</th>
                             <th>Periodo</th>
                             <th>Estado</th>
                             <th class="text-end">Acciones</th>
@@ -103,7 +112,7 @@
                     <tbody>
                         <?php if ($miembros === []): ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">No hay miembros registrados.</td>
+                                <td colspan="6" class="text-center text-muted py-4">No hay miembros registrados.</td>
                             </tr>
                         <?php endif; ?>
 
@@ -115,6 +124,10 @@
                                 </td>
                                 <td>
                                     <?= $miembro['cargo'] === 'presidente_consejo' ? 'Presidente del Consejo' : 'Consejero' ?>
+                                </td>
+                                <td>
+                                    <?= esc($miembro['inmueble'] ?? '—') ?>
+                                    <?php if (! empty($miembro['coeficiente'])): ?><div class="small text-muted"><?= esc($miembro['coeficiente']) ?>%</div><?php endif; ?>
                                 </td>
                                 <td>
                                     <div><?= esc($miembro['fecha_inicio'] ?? '') ?></div>

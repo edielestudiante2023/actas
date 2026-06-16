@@ -180,9 +180,9 @@ class DemoActasSeeder extends Seeder
             ->update();
 
         $miembros = [
-            ['id_usuario' => $this->usuarios['edison'], 'cargo' => 'presidente_consejo'],
-            ['id_usuario' => $this->usuarios['natalia'], 'cargo' => 'consejero'],
-            ['id_usuario' => $this->usuarios['carlos'], 'cargo' => 'consejero'],
+            ['id_usuario' => $this->usuarios['edison'], 'cargo' => 'presidente_consejo', 'inmueble' => $this->inmuebleDe('edison'), 'coeficiente' => 15.50000],
+            ['id_usuario' => $this->usuarios['natalia'], 'cargo' => 'consejero', 'inmueble' => $this->inmuebleDe('natalia'), 'coeficiente' => 12.00000],
+            ['id_usuario' => $this->usuarios['carlos'], 'cargo' => 'consejero', 'inmueble' => $this->inmuebleDe('carlos'), 'coeficiente' => 10.25000],
         ];
 
         foreach ($miembros as $miembro) {
@@ -190,6 +190,8 @@ class DemoActasSeeder extends Seeder
                 'id_cliente'   => $idCliente,
                 'id_usuario'   => $miembro['id_usuario'],
                 'cargo'        => $miembro['cargo'],
+                'inmueble'     => $miembro['inmueble'],
+                'coeficiente'  => $miembro['coeficiente'],
                 'estado'       => 'activo',
                 'fecha_inicio' => date('Y-m-d', strtotime('-1 year')),
                 'fecha_fin'    => null,
@@ -368,6 +370,9 @@ class DemoActasSeeder extends Seeder
 
     private function insertAsistentes(int $idActa, array $asistentes, bool $actaFirmada): array
     {
+        // El administrador siempre acompaña: asiste, no firma obligatoria, no vota, no cuenta para quórum.
+        $asistentes[] = ['user' => 'admin', 'nombre' => 'Administracion Demo', 'cargo' => 'Administrador', 'tipo' => 'administracion', 'asistencia' => 'asiste', 'firma' => null, 'requiere_firma' => 0];
+
         $ids = [];
         foreach ($asistentes as $a) {
             $requiereFirma = (int) ($a['requiere_firma'] ?? 1);
@@ -380,6 +385,7 @@ class DemoActasSeeder extends Seeder
                 'email'          => $this->emailUsuario($a['user']),
                 'telefono'       => '3000000000',
                 'cargo'          => $a['cargo'],
+                'inmueble'       => $this->inmuebleDe($a['user']),
                 'tipo'           => $a['tipo'],
                 'asistencia'     => $a['asistencia'],
                 'requiere_firma' => $requiereFirma,
@@ -394,6 +400,16 @@ class DemoActasSeeder extends Seeder
         }
 
         return $ids;
+    }
+
+    /** Inmueble (unidad de copropiedad) que representa cada miembro del consejo. Admin/asesores no tienen. */
+    private function inmuebleDe(?string $userKey): ?string
+    {
+        return [
+            'edison'  => 'Torre A - Apto 101',
+            'natalia' => 'Torre A - Apto 202',
+            'carlos'  => 'Torre B - Apto 305',
+        ][$userKey] ?? null;
     }
 
     private function insertCompromisos(int $idActa): void

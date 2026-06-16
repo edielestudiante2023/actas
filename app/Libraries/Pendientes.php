@@ -28,6 +28,7 @@ class Pendientes
             ->where('v.modo', 'digital')
             ->where('asi.id_usuario', $idUsuario)
             ->where('asi.asistencia', 'asiste')
+            ->where('asi.tipo', 'miembro_consejo')
             ->where('NOT EXISTS (SELECT 1 FROM tbl_acta_votacion_votos vv WHERE vv.id_votacion = v.id_votacion AND vv.id_asistente = asi.id_asistente)', null, false)
             ->orderBy('v.id_votacion', 'DESC')
             ->get()->getResultArray();

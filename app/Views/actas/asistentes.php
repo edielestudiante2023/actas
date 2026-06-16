@@ -88,6 +88,7 @@
                         <tr>
                             <th>Asistente</th>
                             <th>Cargo</th>
+                            <th>Inmueble</th>
                             <th>Asistencia</th>
                             <th>Firma</th>
                             <th class="text-end">Acciones</th>
@@ -96,7 +97,7 @@
                     <tbody>
                         <?php if ($asistentes === []): ?>
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">Importa el consejo del cliente para cargar asistentes.</td>
+                                <td colspan="6" class="text-center text-muted py-4">Importa el consejo del cliente para cargar asistentes.</td>
                             </tr>
                         <?php endif; ?>
 
@@ -110,6 +111,7 @@
                                     <div><?= esc($asistente['cargo'] ?? '') ?></div>
                                     <div class="small text-muted"><?= esc($asistente['tipo']) ?></div>
                                 </td>
+                                <td><?= esc($asistente['inmueble'] ?? '—') ?></td>
                                 <td>
                                     <span class="badge <?= $asistente['asistencia'] === 'asiste' ? 'bg-success' : ($asistente['asistencia'] === 'excusa' ? 'bg-warning text-dark' : 'bg-secondary') ?>">
                                         <?= esc($asistente['asistencia']) ?>

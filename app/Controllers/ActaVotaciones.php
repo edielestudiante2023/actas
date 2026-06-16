@@ -116,8 +116,8 @@ class ActaVotaciones extends BaseController
         }
 
         $asistente = $this->asistentes->asistenteDeUsuario($idActa, (int) session('id_usuario'));
-        if ($asistente === null || $asistente['asistencia'] !== 'asiste') {
-            return redirect()->to('/actas/' . $idActa . '/votaciones')->with('error', 'Solo los asistentes presentes pueden votar.');
+        if ($asistente === null || $asistente['asistencia'] !== 'asiste' || $asistente['tipo'] !== 'miembro_consejo') {
+            return redirect()->to('/actas/' . $idActa . '/votaciones')->with('error', 'Solo los miembros del consejo presentes pueden votar.');
         }
 
         $voto = (string) $this->request->getPost('voto');
@@ -180,8 +180,8 @@ class ActaVotaciones extends BaseController
         $errores  = 0;
 
         foreach ($this->asistentes->asistentesActa($idActa) as $a) {
-            if (($a['asistencia'] ?? '') !== 'asiste') {
-                continue;
+            if (($a['asistencia'] ?? '') !== 'asiste' || ($a['tipo'] ?? '') !== 'miembro_consejo') {
+                continue; // solo miembros del consejo votan (admin/asesores no)
             }
             if (empty($a['email']) || ! filter_var($a['email'], FILTER_VALIDATE_EMAIL)) {
                 continue;

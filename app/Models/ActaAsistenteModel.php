@@ -19,6 +19,7 @@ class ActaAsistenteModel extends Model
         'email',
         'telefono',
         'cargo',
+        'inmueble',
         'tipo',
         'asistencia',
         'requiere_firma',
@@ -39,7 +40,7 @@ class ActaAsistenteModel extends Model
     public function importarConsejo(int $idActa, int $idCliente): int
     {
         $miembros = $this->db->table('tbl_cliente_consejo cc')
-            ->select('cc.cargo, u.id_usuario, u.nombre_completo, u.email, u.telefono')
+            ->select('cc.cargo, cc.inmueble, u.id_usuario, u.nombre_completo, u.email, u.telefono')
             ->join('tbl_usuarios u', 'u.id_usuario = cc.id_usuario')
             ->where('cc.id_cliente', $idCliente)
             ->where('cc.estado', 'activo')
@@ -66,6 +67,7 @@ class ActaAsistenteModel extends Model
                 'email'          => $miembro['email'],
                 'telefono'       => $miembro['telefono'],
                 'cargo'          => $miembro['cargo'] === 'presidente_consejo' ? 'Presidente del Consejo' : 'Consejero',
+                'inmueble'       => $miembro['inmueble'] ?? null,
                 'tipo'           => 'miembro_consejo',
                 'asistencia'     => 'asiste',
                 'requiere_firma' => 1,

@@ -16,6 +16,8 @@ class ClienteConsejoModel extends Model
         'id_cliente',
         'id_usuario',
         'cargo',
+        'inmueble',
+        'coeficiente',
         'estado',
         'fecha_inicio',
         'fecha_fin',
