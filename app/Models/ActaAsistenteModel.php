@@ -97,4 +97,14 @@ class ActaAsistenteModel extends Model
             'cumple'    => $total > 0 && $presentes >= $requerido,
         ];
     }
+
+    /**
+     * Asistente del acta que corresponde al usuario en sesión (para votar en-app).
+     */
+    public function asistenteDeUsuario(int $idActa, int $idUsuario): ?array
+    {
+        return $this->where('id_acta', $idActa)
+            ->where('id_usuario', $idUsuario)
+            ->first();
+    }
 }

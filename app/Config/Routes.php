@@ -55,6 +55,9 @@ $routes->group('actas', ['filter' => ['auth', 'cliente']], static function ($rou
     $routes->post('(:num)/compromisos/(:num)', 'ActaCompromisos::update/$1/$2');
     $routes->get('(:num)/votaciones', 'ActaVotaciones::index/$1');
     $routes->post('(:num)/votaciones', 'ActaVotaciones::create/$1');
+    $routes->post('(:num)/votaciones/abrir', 'ActaVotaciones::abrir/$1');
+    $routes->post('(:num)/votaciones/(:num)/votar', 'ActaVotaciones::votar/$1/$2');
+    $routes->post('(:num)/votaciones/(:num)/cerrar', 'ActaVotaciones::cerrar/$1/$2');
     $routes->post('(:num)/votaciones/(:num)', 'ActaVotaciones::update/$1/$2');
     $routes->get('(:num)/anexos', 'ActaAnexos::index/$1');
     $routes->post('(:num)/anexos', 'ActaAnexos::create/$1');

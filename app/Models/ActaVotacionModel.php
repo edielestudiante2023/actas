@@ -20,6 +20,8 @@ class ActaVotacionModel extends Model
         'votos_contra',
         'abstenciones',
         'resultado',
+        'estado',
+        'modo',
         'detalle_votos',
     ];
 
