@@ -6,6 +6,7 @@
     <title>Nueva contraseña · Actas</title>
     <meta name="theme-color" content="#0d6efd">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <?= $this->include("partials/pwa_head") ?>
     <style>
         body { background: #f1f3f5; min-height: 100vh; display: flex; align-items: center; }
         .auth-card { max-width: 440px; width: 100%; margin: auto; border: none; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,.14); }

@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Actas">
-    <link rel="manifest" href="<?= base_url('manifest_login.json') ?>">
+    <link rel="manifest" href="<?= base_url('manifest.json') ?>">
     <link rel="apple-touch-icon" href="<?= base_url('assets/icons/icon-192.png') ?>">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -198,7 +198,7 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
-            navigator.serviceWorker.register('<?= base_url('sw_login.js') ?>', { scope: '/', updateViaCache: 'none' })
+            navigator.serviceWorker.register('<?= base_url('sw.js') ?>', { scope: '/', updateViaCache: 'none' })
                 .catch(function (err) { console.log('SW login error:', err); });
         });
     }

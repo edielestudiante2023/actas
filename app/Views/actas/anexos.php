@@ -22,6 +22,7 @@ $fmtSize = static function (?int $b): string {
     <title>Anexos · <?= esc($acta['numero']) ?></title>
     <meta name="theme-color" content="#0d6efd">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <?= $this->include("partials/pwa_head") ?>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-primary px-3">

@@ -6,6 +6,7 @@
     <title>Firmar acta · <?= esc($cliente['nombre'] ?? 'Actas') ?></title>
     <meta name="theme-color" content="#0d6efd">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <?= $this->include("partials/pwa_head") ?>
     <style>
         body { background: #f1f3f5; }
         .firma-canvas { border: 2px dashed #adb5bd; border-radius: 12px; width: 100%; height: 220px; touch-action: none; background: #fff; }
