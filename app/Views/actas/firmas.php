@@ -1,26 +1,16 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firmas · <?= esc($acta['numero']) ?></title>
-    <meta name="theme-color" content="#0d6efd">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <?= $this->include("partials/pwa_head") ?>
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-primary px-3">
-        <a href="<?= base_url('dashboard') ?>" class="navbar-brand fw-bold text-decoration-none">Actas</a>
-        <div class="d-flex gap-2">
-            <a href="<?= base_url('actas/' . $acta['id_acta'] . '/anexos') ?>" class="btn btn-sm btn-outline-light">Anexos</a>
-            <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-light" target="_blank" rel="noopener">PDF</a>
-            <a href="<?= base_url('actas/' . $acta['id_acta'] . '/word') ?>" class="btn btn-sm btn-outline-light">Word</a>
-            <a href="<?= base_url('actas') ?>" class="btn btn-sm btn-outline-light">Actas</a>
-            <a href="<?= base_url('logout') ?>" class="btn btn-sm btn-outline-light">Cerrar sesión</a>
-        </div>
-    </nav>
+<?= $this->extend('layouts/base') ?>
 
-    <main class="container py-4">
+<?= $this->section('title') ?>Firmas · <?= esc($acta['numero']) ?><?= $this->endSection() ?>
+
+<?= $this->section('navActions') ?>
+    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/asistentes') ?>" class="btn btn-sm btn-outline-light">Asistentes</a>
+    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/anexos') ?>" class="btn btn-sm btn-outline-light">Anexos</a>
+    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/pdf') ?>" class="btn btn-sm btn-outline-light" target="_blank" rel="noopener">PDF</a>
+    <a href="<?= base_url('actas/' . $acta['id_acta'] . '/word') ?>" class="btn btn-sm btn-outline-light">Word</a>
+    <a href="<?= base_url('actas') ?>" class="btn btn-sm btn-outline-light">Actas</a>
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
         <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center mb-3">
             <div>
                 <h4 class="mb-1">Estado de firmas</h4>
@@ -30,13 +20,6 @@
                 <span class="badge bg-primary fs-6"><?= (int) $firmados ?> / <?= (int) $total ?> firmadas</span>
             </div>
         </div>
-
-        <?php if (session('error')): ?>
-            <div class="alert alert-danger py-2"><?= esc(session('error')) ?></div>
-        <?php endif; ?>
-        <?php if (session('success')): ?>
-            <div class="alert alert-success py-2"><?= esc(session('success')) ?></div>
-        <?php endif; ?>
 
         <?php if (! empty($acta['codigo_verificacion'])): ?>
             <div class="alert alert-success">
@@ -282,8 +265,4 @@
                 </div>
             </div>
         </div>
-    </main>
-    <?= $this->include("partials/home_fab") ?>
-    <?= $this->include("partials/notif_bell") ?>
-</body>
-</html>
+<?= $this->endSection() ?>
