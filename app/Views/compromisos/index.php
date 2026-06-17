@@ -116,6 +116,7 @@
     $(function () {
         var table = $('#tablaCompromisos').DataTable({
             orderCellsTop: true,
+            scrollX: true,
             pageLength: 25,
             lengthMenu: [10, 25, 50, 100],
             order: [[3, 'asc']],
