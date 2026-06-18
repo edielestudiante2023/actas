@@ -28,6 +28,7 @@
         <a href="<?= base_url('compromisos?mios=1') ?>" class="btn btn-sm <?= $verMios ? 'btn-primary' : 'btn-outline-primary' ?>">Míos (<?= (int) $countMios ?>)</a>
     </div>
 
+    <div class="small text-muted mb-1">🔎 Toca un estado para filtrar la tabla:</div>
     <div class="d-flex flex-wrap gap-2 mb-3">
         <a href="<?= base_url('compromisos?mios=' . $m) ?>" class="badge bg-secondary chip <?= $estadoActivo === '' ? 'activo' : '' ?>">Total: <?= (int) $resumen['total'] ?></a>
         <a href="<?= base_url('compromisos?mios=' . $m . '&estado=pendiente') ?>" class="badge bg-warning text-dark chip <?= $estadoActivo === 'pendiente' ? 'activo' : '' ?>">Pendientes: <?= (int) $resumen['pendiente'] ?></a>
